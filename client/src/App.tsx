@@ -2,29 +2,32 @@ import React, { useEffect, useState } from 'react';
 import io from 'socket.io-client';
 import './App.css';
 
+const SERVER_URL = process.env.REACT_APP_SERVER_URL || 'http://localhost:3000';
+
 const App: React.FC = () => {
   const [messages, setMessages] = useState<string[]>([]);
   const [inputMessage, setInputMessage] = useState<string>('');
+  const [socket, setSocket] = useState<any>(null);
 
   useEffect(() => {
-    const io = require('socket.io-client');
-    const socket = io('http://localhost:8080', {
+    const newSocket = io(SERVER_URL, {
       withCredentials: true,
     });
 
-    socket.on('chat message', (msg: string) => {
+    setSocket(newSocket);
+
+    newSocket.on('chat message', (msg: string) => {
       setMessages((prevMessages) => [...prevMessages, msg]);
     });
 
     return () => {
-      socket.disconnect();
+      newSocket.disconnect();
     };
   }, []);
 
   const sendMessage = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (inputMessage.trim() !== '') {
-      const socket = io('http://localhost:8080');
+    if (inputMessage.trim() !== '' && socket) {
       socket.emit('chat message', inputMessage);
       setInputMessage('');
     }
