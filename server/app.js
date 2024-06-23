@@ -1,6 +1,7 @@
-const express = require('express');
-const { createServer } = require('node:http');
 require('dotenv-flow').config();
+const express = require('express');
+const cors = require('cors');
+const { createServer } = require('node:http');
 const { join } = require('node:path');
 const { Server } = require('socket.io');
 // require('openai');
@@ -9,7 +10,16 @@ const { Server } = require('socket.io');
 const PORT = process.env.PORT || 8080;
 const app = express();
 const server = createServer(app);
-const io = new Server(server);
+const io = require('socket.io')(server, {
+  cors: {
+    origin: 'http://localhost:3000',
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['my-custom-header'],
+    credentials: true,
+  },
+});
+
+// app.use(cors());
 
 app.get('/', (req, res) => {
   res.sendFile(join(__dirname, 'index.html'));
@@ -18,6 +28,10 @@ app.get('/', (req, res) => {
 io.on('connection', (socket) => {
   socket.on('chat message', (msg) => {
     io.emit('chat message', msg);
+  });
+
+  socket.onAny((event, ...args) => {
+    console.log(event, args);
   });
 });
 
