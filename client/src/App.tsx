@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import io from 'socket.io-client';
 import './App.css';
 
-const SERVER_URL = process.env.REACT_APP_SERVER_URL || 'http://localhost:3000';
+const SERVER_URL = process.env.REACT_APP_SERVER_URL || 'http://localhost:8080';
 
 const App: React.FC = () => {
   const [messages, setMessages] = useState<string[]>([]);
