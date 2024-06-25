@@ -32,6 +32,9 @@ const Chat: React.FC<Props> = ({ messages, sendMessage, player }) => {
 
   return (
     <div className={styles.chatContainer}>
+      <div className={styles.playerInfo}>
+        <p>You are playing as {player.name}</p>
+      </div>
       <div className={styles.messagesContainer}>
         <ul className={styles.messages}>
           {messages.map((msg, index) => (

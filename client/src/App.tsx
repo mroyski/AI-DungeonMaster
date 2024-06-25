@@ -4,6 +4,8 @@ import Chat from './components/Chat';
 import { usePlayerContext } from './lib/PlayerContext';
 import SelectPlayer from './components/SelectPlayer';
 import PlayerDetails from './components/PlayerDetails';
+import styles from './App.module.css';
+
 const SERVER_URL = process.env.REACT_APP_SERVER_URL || 'http://localhost:8080';
 
 const PLAYER_SELECT = 'playerselect';
@@ -68,7 +70,8 @@ const App: React.FC = () => {
 
   return (
     <>
-      <nav>
+      <nav className={styles.navbar}>
+        <p>RPG</p>
         <button onClick={() => setActiveComponent(CHAT)}>Chat</button>
         <button onClick={() => setActiveComponent(PLAYER_DETAILS)}>
           Player Details

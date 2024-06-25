@@ -1,0 +1,26 @@
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #333;
+    color: white;
+    padding: 10px;
+  }
+  
+  .navbar p {
+    margin-right: auto;
+  }
+  
+  .navbar button {
+    margin-left: 10px;
+    padding: 8px 16px;
+    background-color: #555;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .navbar button:hover {
+    background-color: #777;
+  }
+  
