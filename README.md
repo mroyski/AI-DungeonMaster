@@ -4,6 +4,8 @@ Pick a class, chat with your party, and ChatGPT will generate dugeons and handle
 
 To run locally, launch the React client and Express server applications.
 
+To message the dungeon master, prefix your chat message with `/dm` i.e. `/dm start the adventure!`
+
 ## Development
 
 ### Client
