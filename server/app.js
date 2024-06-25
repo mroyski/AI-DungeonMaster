@@ -29,7 +29,7 @@ const messageAgent = async (message) => {
     const assistantMessage = completion.choices[0].message.content;
     interactionHistory.push({ role: 'assistant', content: assistantMessage });
     console.log('INTERACTION HISTORY *****', interactionHistory);
-    return assistantMessage;
+    return { message: assistantMessage, sender: 'DM' };
   } catch (error) {
     console.log(error);
   }
