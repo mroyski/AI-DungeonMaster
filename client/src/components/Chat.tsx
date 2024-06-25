@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import styles from './Chat.module.css';
+import { Player } from '../interfaces/Player.interface';
 
 interface Props {
   messages: Array<string>;
   sendMessage: (e: React.FormEvent<HTMLFormElement>, message: string) => void;
+  player: Player;
 }
 
-const Chat: React.FC<Props> = ({ messages, sendMessage }) => {
+const Chat: React.FC<Props> = ({ messages, sendMessage, player }) => {
   const [inputMessage, setInputMessage] = useState<string>('');
 
   const sendMessageHandler = (e: React.FormEvent<HTMLFormElement>) => {
@@ -16,6 +18,7 @@ const Chat: React.FC<Props> = ({ messages, sendMessage }) => {
 
   return (
     <div>
+      <p>You are playing as {player.name}</p>
       <ul className={styles.messages}>
         {messages.map((msg, index) => (
           <li key={index}>{msg}</li>

@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import io from 'socket.io-client';
-import './App.css';
 import Chat from './components/Chat';
-
+import { usePlayerContext } from './lib/PlayerContext';
+import SelectPlayer from './components/SelectPlayer';
 const SERVER_URL = process.env.REACT_APP_SERVER_URL || 'http://localhost:8080';
 
 const App: React.FC = () => {
-  const [messages, setMessages] = useState<string[]>([]);
+  const { player, setPlayer, messages, setMessages } = usePlayerContext();
   const [socket, setSocket] = useState<any>(null);
 
   useEffect(() => {
@@ -23,7 +23,7 @@ const App: React.FC = () => {
     return () => {
       newSocket.disconnect();
     };
-  }, []);
+  }, [setMessages]);
 
   const sendMessage = (
     e: React.FormEvent<HTMLFormElement>,
@@ -35,9 +35,12 @@ const App: React.FC = () => {
     }
   };
 
+  if (!player) return <SelectPlayer setPlayer={setPlayer} />;
+
   return (
     <>
-      <Chat messages={messages} sendMessage={sendMessage} />
+      <button onClick={() => setPlayer(null)}>Player Select</button>
+      <Chat messages={messages} sendMessage={sendMessage} player={player} />
     </>
   );
 };
