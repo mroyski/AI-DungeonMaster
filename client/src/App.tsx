@@ -15,23 +15,38 @@ const CHAT = 'chat';
 const App: React.FC = () => {
   const { player, setPlayer, messages, setMessages } = usePlayerContext();
   const [socket, setSocket] = useState<any>(null);
-  const [activeComponent, setActiveComponent] = useState('selectplayer');
+  const [activeComponent, setActiveComponent] = useState(PLAYER_SELECT);
 
   useEffect(() => {
-    const newSocket = io(SERVER_URL, {
-      withCredentials: true,
-    });
+    if (player) {
+      const socket = io(SERVER_URL, {
+        withCredentials: true,
+      });
 
-    setSocket(newSocket);
+      socket.on('connect', () => {
+        console.log('Player connected to server', player);
+        socket.emit('setPlayerName', player.name);
+      });
 
-    newSocket.on('chat message', (msg: string) => {
-      setMessages((prevMessages) => [...prevMessages, msg]);
-    });
+      socket.on('chat message', (msg: string) => {
+        setMessages((prevMessages) => [...prevMessages, msg]);
+      });
 
-    return () => {
-      newSocket.disconnect();
-    };
-  }, [setMessages]);
+      socket.on('players', (players: any[]) => {
+        console.log(players);
+      });
+
+      socket.on('player disconnected', (playerSocketId: string) => {
+        console.log('Player disconnected', playerSocketId);
+      });
+
+      setSocket(socket);
+
+      return () => {
+        socket.disconnect();
+      };
+    }
+  }, [player, setMessages]);
 
   const sendMessage = (
     e: React.FormEvent<HTMLFormElement>,

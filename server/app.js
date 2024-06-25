@@ -64,6 +64,24 @@ app.get('/', (req, res) => {
 });
 
 io.on('connection', (socket) => {
+  socket.on('setPlayerName', (playername) => {
+    socket.playername = playername;
+    console.log(`Player ${playername} connected.`);
+
+    const players = [];
+    for (let [id, socket] of io.of('/').sockets) {
+      players.push({ playerId: id, playername: socket.playername });
+    }
+
+    io.emit('players', players);
+
+    // Notify others about new player
+    socket.broadcast.emit('player connected', {
+      playerId: socket.id,
+      playername: playername,
+    });
+  });
+
   socket.on('chat message', (msg) => {
     io.emit('chat message', msg);
 
@@ -77,6 +95,17 @@ io.on('connection', (socket) => {
       messageAgent(msg).then((response) => {
         io.emit('chat message', response);
       });
+    }
+  });
+
+  socket.on('disconnect', () => {
+    console.log(`Player ${socket.playername} disconnected.`);
+    io.emit('player disconnected', socket.id);
+
+    // Update player list after disconnect
+    const players = [];
+    for (let [id, socket] of io.of('/').sockets) {
+      players.push({ playerId: id, playername: socket.playername });
     }
   });
 
