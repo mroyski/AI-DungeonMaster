@@ -10,7 +10,6 @@ const Chat: React.FC<Props> = ({ messages, sendMessage }) => {
   const [inputMessage, setInputMessage] = useState<string>('');
 
   const sendMessageHandler = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
     sendMessage(e, inputMessage);
     setInputMessage('');
   };
