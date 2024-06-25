@@ -59,53 +59,59 @@ Before we begin playing, I would like you to provide my three adventure options.
   return await messageAgent(initialMessage);
 };
 
+const chatHistory = [];
+
 app.get('/', (req, res) => {
   res.sendFile(join(__dirname, 'index.html'));
 });
 
 io.on('connection', (socket) => {
-  socket.on('setPlayerName', (playername) => {
-    socket.playername = playername;
-    console.log(`Player ${playername} connected.`);
+  playername = socket.handshake.auth.playername;
+  console.log(`Player ${playername} connected.`);
 
-    const players = [];
-    for (let [id, socket] of io.of('/').sockets) {
-      players.push({ playerId: id, playername: socket.playername });
-    }
-
-    io.emit('players', players);
-
-    // Notify others about new player
-    socket.broadcast.emit('player connected', {
-      playerId: socket.id,
-      playername: playername,
+  const players = [];
+  for (let [id, socket] of io.of('/').sockets) {
+    players.push({
+      playerId: id,
+      playername: socket.handshake.auth.playername,
     });
+  }
+
+  io.emit('players', players);
+
+  socket.broadcast.emit('player connected', {
+    playerId: socket.id,
+    playername: playername,
   });
 
-  socket.on('chat message', (msg) => {
-    io.emit('chat message', msg);
+  socket.on('chat message', ({ message, sender }) => {
+    io.emit('chat message', { message, sender });
 
-    if (msg.substring(0, 3).toLowerCase() !== '/dm') return;
+    if (message.substring(0, 3).toLowerCase() !== '/dm') return;
 
     if (interactionHistory.length === 0) {
       startGame().then((response) => {
         io.emit('chat message', response);
       });
     } else {
-      messageAgent(msg).then((response) => {
+      messageAgent(message).then((response) => {
         io.emit('chat message', response);
       });
     }
   });
 
   socket.on('disconnect', () => {
-    console.log(`Player ${socket.playername} disconnected.`);
+    console.log(
+      `Player ${socket.id} - ${socket.handshake.auth.playername} disconnected.`
+    );
     io.emit('player disconnected', socket.id);
 
-    // Update player list after disconnect
     const players = [];
     for (let [id, socket] of io.of('/').sockets) {
-      players.push({ playerId: id, playername: socket.playername });
+      players.push({
+        playerId: id,
+        playername: socket.handshake.auth.playername,
+      });
     }
   });
 

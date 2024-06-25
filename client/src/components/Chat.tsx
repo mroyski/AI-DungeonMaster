@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styles from './Chat.module.css';
 import { Player } from '../interfaces/Player.interface';
+import { Message } from '../interfaces/Message.interface';
 
 interface Props {
-  messages: Array<string>;
+  messages: Array<Message>;
   sendMessage: (e: React.FormEvent<HTMLFormElement>, message: string) => void;
   player: Player | null;
 }
@@ -44,7 +45,7 @@ const Chat: React.FC<Props> = ({ messages, sendMessage, player }) => {
                 index % 2 === 0 ? styles.messageOdd : styles.messageEven
               }
             >
-              {msg}
+              {msg.sender}: {msg.message}
             </li>
           ))}
           <div ref={messagesEndRef} />

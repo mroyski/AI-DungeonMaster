@@ -8,19 +8,20 @@ import React, {
 } from 'react';
 
 import { Player } from '../interfaces/Player.interface';
+import { Message } from '../interfaces/Message.interface';
 
 interface PlayerContextType {
   player: Player | null;
   setPlayer: Dispatch<SetStateAction<Player | null>>;
-  messages: string[];
-  setMessages: Dispatch<SetStateAction<string[]>>;
+  messages: Message[];
+  setMessages: Dispatch<SetStateAction<Message[]>>;
 }
 
 const PlayerContext = createContext<PlayerContextType | null>(null);
 
 const PlayerProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [player, setPlayer] = useState<Player | null>(null);
-  const [messages, setMessages] = useState<string[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
 
   return (
     <PlayerContext.Provider

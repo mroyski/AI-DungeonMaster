@@ -21,15 +21,11 @@ const App: React.FC = () => {
     if (player) {
       const socket = io(SERVER_URL, {
         withCredentials: true,
+        auth: { playername: player.name },
       });
 
-      socket.on('connect', () => {
-        console.log('Player connected to server', player);
-        socket.emit('setPlayerName', player.name);
-      });
-
-      socket.on('chat message', (msg: string) => {
-        setMessages((prevMessages) => [...prevMessages, msg]);
+      socket.on('chat message', (data: { message: string; sender: string }) => {
+        setMessages((prevMessages) => [...prevMessages, data]);
       });
 
       socket.on('players', (players: any[]) => {
@@ -53,8 +49,8 @@ const App: React.FC = () => {
     message: string
   ) => {
     e.preventDefault();
-    if (message.trim() !== '' && socket) {
-      socket.emit('chat message', message);
+    if (message.trim() !== '' && socket && player) {
+      socket.emit('chat message', { message, sender: player.name });
     }
   };
 
