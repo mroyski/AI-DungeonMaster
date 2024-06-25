@@ -3,11 +3,17 @@ import io from 'socket.io-client';
 import Chat from './components/Chat';
 import { usePlayerContext } from './lib/PlayerContext';
 import SelectPlayer from './components/SelectPlayer';
+import PlayerDetails from './components/PlayerDetails';
 const SERVER_URL = process.env.REACT_APP_SERVER_URL || 'http://localhost:8080';
+
+const PLAYER_SELECT = 'playerselect';
+const PLAYER_DETAILS = 'playerdetails';
+const CHAT = 'chat';
 
 const App: React.FC = () => {
   const { player, setPlayer, messages, setMessages } = usePlayerContext();
   const [socket, setSocket] = useState<any>(null);
+  const [activeComponent, setActiveComponent] = useState('selectplayer');
 
   useEffect(() => {
     const newSocket = io(SERVER_URL, {
@@ -35,12 +41,43 @@ const App: React.FC = () => {
     }
   };
 
-  if (!player) return <SelectPlayer setPlayer={setPlayer} />;
+  const renderComponent = () => {
+    switch (activeComponent) {
+      case PLAYER_DETAILS:
+        return <PlayerDetails player={player} />;
+      case PLAYER_SELECT:
+        return (
+          <SelectPlayer
+            setPlayer={setPlayer}
+            returnToChat={() => setActiveComponent(CHAT)}
+          />
+        );
+      case 'chat':
+        return (
+          <Chat messages={messages} sendMessage={sendMessage} player={player} />
+        );
+      default:
+        return (
+          <SelectPlayer
+            setPlayer={setPlayer}
+            returnToChat={() => setActiveComponent(CHAT)}
+          />
+        );
+    }
+  };
 
   return (
     <>
-      <button onClick={() => setPlayer(null)}>Player Select</button>
-      <Chat messages={messages} sendMessage={sendMessage} player={player} />
+      <nav>
+        <button onClick={() => setActiveComponent(CHAT)}>Chat</button>
+        <button onClick={() => setActiveComponent(PLAYER_DETAILS)}>
+          Player Details
+        </button>
+        <button onClick={() => setActiveComponent(PLAYER_SELECT)}>
+          Player Select
+        </button>
+      </nav>
+      {renderComponent()}
     </>
   );
 };

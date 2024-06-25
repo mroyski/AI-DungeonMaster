@@ -1,33 +1,20 @@
-.form {
-  background: rgba(0, 0, 0, 0.15);
-  padding: 0.25rem;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
+/* Chat.module.css */
+
+.chatContainer {
+  background-color: #f0e8d8;
+  border: 2px solid #5e503f;
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  height: calc(100vh - 100px); /* Adjust height to ensure it fits within the viewport */
   display: flex;
-  height: 3rem;
-  box-sizing: border-box;
-  backdrop-filter: blur(10px);
+  flex-direction: column;
 }
-.input {
-  border: none;
-  padding: 0 1rem;
-  flex-grow: 1;
-  border-radius: 2rem;
-  margin: 0.25rem;
-}
-.input:focus {
-  outline: none;
-}
-.form > button {
-  background: #333;
-  border: none;
-  padding: 0 1rem;
-  margin: 0.25rem;
-  border-radius: 3px;
-  outline: none;
-  color: #fff;
+
+.messagesContainer {
+  flex-grow: 1; /* This ensures messages container takes remaining space */
+  overflow-y: auto; /* Enables vertical scroll for overflow */
 }
 
 .messages {
@@ -35,9 +22,60 @@
   margin: 0;
   padding: 0;
 }
+
 .messages > li {
-  padding: 0.5rem 1rem;
+  padding: 10px;
 }
-.messages > li:nth-child(odd) {
-  background: #efefef;
+
+.messageOdd {
+  background-color: #efefef; /* Light gray */
+}
+
+.messageEven {
+  background-color: #ffffff; /* White */
+}
+
+.form {
+  background: rgba(0, 0, 0, 0.15);
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  border-radius: 20px;
+  box-sizing: border-box;
+  backdrop-filter: blur(10px);
+  margin-top: auto; /* Push form to the bottom of the chat container */
+}
+
+.input {
+  border: none;
+  padding: 10px;
+  flex-grow: 1;
+  border-radius: 20px;
+  margin-right: 10px;
+  font-size: 16px;
+}
+
+.input:focus {
+  outline: none;
+}
+
+.button {
+  background-color: #8b4513; /* Brown */
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 20px;
+}
+
+.button:hover {
+  background-color: #5e503f; /* Darker brown on hover */
+}
+
+.error {
+  color: #b30000; /* Dark red */
+  font-size: 18px;
+  font-weight: bold;
+  margin-top: 20px;
 }
