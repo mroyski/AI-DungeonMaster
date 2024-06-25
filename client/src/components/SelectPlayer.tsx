@@ -5,7 +5,7 @@ import {
   PlayerClass,
   playerClasses,
 } from '../interfaces/Player.interface';
-import styles from './SelectPlayer.module.css'; // Import CSS module for styling
+import styles from './SelectPlayer.module.css';
 
 const SelectPlayer: React.FC<{
   setPlayer: Dispatch<SetStateAction<Player | null>>;
