@@ -2,7 +2,6 @@ require('dotenv-flow').config();
 const express = require('express');
 const { createServer } = require('node:http');
 const { join } = require('node:path');
-const { Server } = require('socket.io');
 const { default: OpenAI } = require('openai');
 
 const PORT = process.env.PORT || 8080;
