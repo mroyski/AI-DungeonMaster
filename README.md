@@ -42,6 +42,10 @@ $ cd server/
 $ npm i
 ```
 
+#### Setup ChatGPT Authentication
+- You must add your own ChatGPT API Key
+- Create an .env.local file and set OPENAI_API_KEY=your_api_key
+
 #### Run Development Server
 
 ```console
