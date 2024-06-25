@@ -61,10 +61,6 @@ Before we begin playing, I would like you to provide my three adventure options.
 
 const chatHistory = [];
 
-app.get('/', (req, res) => {
-  res.sendFile(join(__dirname, 'index.html'));
-});
-
 io.on('connection', (socket) => {
   playername = socket.handshake.auth.playername;
   console.log(`Player ${playername} connected.`);
