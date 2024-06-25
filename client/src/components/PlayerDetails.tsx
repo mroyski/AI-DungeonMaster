@@ -1,6 +1,6 @@
 import React from 'react';
 import { Player } from '../interfaces/Player.interface';
-import styles from './PlayerDetails.module.css'; // Import CSS module for styling
+import styles from './PlayerDetails.module.css';
 
 const PlayerDetails: React.FC<{ player: Player | null }> = ({ player }) => {
   if (!player) return <p className={styles.error}>Please select a player!</p>;
