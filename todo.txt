@@ -3,6 +3,7 @@ Client
 - Add friends list and display friends who are connected via web socket
 - Tell the DM information about the character who started the game so they don't have to do it manually
 - Add ability for new chatters to join the game by sending a message to the DM or clicking a button
+- Add view to search available rooms to join
 
 Server
 - Save chat history
