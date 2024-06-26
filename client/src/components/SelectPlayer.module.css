@@ -1,37 +1,35 @@
 .selectPlayer {
-    background-color: #f0e8d8;
-    border: 2px solid #5e503f;
-    border-radius: 8px;
-    padding: 16px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  .playerOption {
-    margin-bottom: 16px;
-  }
-  
-  .playerButton {
-    background-color: #8b4513;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    border-radius: 4px;
-  }
-  
-  .playerButton:hover {
-    background-color: #5e503f;
-  }
-  
-  .playerDescription {
-    font-size: 14px;
-    margin-top: 8px;
-  }
-  
-  .hr {
-    border: none;
-    border-top: 1px solid #5e503f;
-    margin-top: 12px;
-  }
-  
+  background-color: #f0e8d8;
+  border: 2px solid #5e503f;
+  padding: 16px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.playerOption {
+  margin-bottom: 16px;
+}
+
+.playerButton {
+  background-color: #8b4513;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.playerButton:hover {
+  background-color: #5e503f;
+}
+
+.playerDescription {
+  font-size: 14px;
+  margin-top: 8px;
+}
+
+.hr {
+  border: none;
+  border-top: 1px solid #5e503f;
+  margin-top: 12px;
+}
