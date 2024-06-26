@@ -61,23 +61,29 @@ Before we begin playing, I would like you to provide my three adventure options.
 
 const chatHistory = [];
 
-io.on('connection', (socket) => {
-  playername = socket.handshake.auth.playername;
-  console.log(`Player ${playername} connected.`);
+io.use((socket, next) => {
+  const name = socket.handshake.auth.name;
+  if (!name) {
+    return next(new Error('invalid name'));
+  }
+  console.log(`Player ${name} ${socket.id} connected.`);
+  socket.name = name;
+  next();
+});
 
+io.on('connection', (socket) => {
   const players = [];
   for (let [id, socket] of io.of('/').sockets) {
     players.push({
-      playerId: id,
-      playername: socket.handshake.auth.playername,
+      id: id,
+      name: socket.handshake.auth.name,
     });
   }
-
   io.emit('players', players);
 
   socket.broadcast.emit('player connected', {
-    playerId: socket.id,
-    playername: playername,
+    id: socket.id,
+    name: socket.handshake.auth.name,
   });
 
   socket.on('chat message', ({ message, sender }) => {
@@ -98,17 +104,19 @@ io.on('connection', (socket) => {
 
   socket.on('disconnect', () => {
     console.log(
-      `Player ${socket.id} - ${socket.handshake.auth.playername} disconnected.`
+      `Player ${socket.id} - ${socket.handshake.auth.name} disconnected.`
     );
     io.emit('player disconnected', socket.id);
 
     const players = [];
     for (let [id, socket] of io.of('/').sockets) {
       players.push({
-        playerId: id,
-        playername: socket.handshake.auth.playername,
+        id: id,
+        name: socket.handshake.auth.name,
       });
     }
+
+    io.emit('players', players);
   });
 
   socket.onAny((event, ...args) => {

@@ -5,15 +5,20 @@ import { usePlayerContext } from './lib/PlayerContext';
 import SelectPlayer from './components/SelectPlayer';
 import PlayerDetails from './components/PlayerDetails';
 import styles from './App.module.css';
+import { Player } from './interfaces/Player.interface';
+import Players from './components/Players';
+import PlayersOnline from './components/PlayersOnline';
 
 const SERVER_URL = process.env.REACT_APP_SERVER_URL || 'http://localhost:8080';
 
+const PLAYERS = 'players';
 const PLAYER_SELECT = 'playerselect';
 const PLAYER_DETAILS = 'playerdetails';
 const CHAT = 'chat';
 
 const App: React.FC = () => {
-  const { player, setPlayer, messages, setMessages } = usePlayerContext();
+  const { player, setPlayer, players, setPlayers, messages, setMessages } =
+    usePlayerContext();
   const [socket, setSocket] = useState<any>(null);
   const [activeComponent, setActiveComponent] = useState(PLAYER_SELECT);
 
@@ -21,7 +26,7 @@ const App: React.FC = () => {
     if (player) {
       const socket = io(SERVER_URL, {
         withCredentials: true,
-        auth: { playername: player.name },
+        auth: { name: player.name },
       });
 
       socket.on('chat message', (data: { message: string; sender: string }) => {
@@ -29,7 +34,9 @@ const App: React.FC = () => {
       });
 
       socket.on('players', (players: any[]) => {
-        console.log(players);
+        console.log('players: ', players);
+        const otherPlayers = players.filter((p) => p.id !== socket.id);
+        setPlayers(otherPlayers);
       });
 
       socket.on('player disconnected', (playerSocketId: string) => {
@@ -42,7 +49,7 @@ const App: React.FC = () => {
         socket.disconnect();
       };
     }
-  }, [player, setMessages]);
+  }, [player, setMessages, setPlayers]);
 
   const sendMessage = (
     e: React.FormEvent<HTMLFormElement>,
@@ -69,6 +76,8 @@ const App: React.FC = () => {
         return (
           <Chat messages={messages} sendMessage={sendMessage} player={player} />
         );
+      case 'players':
+        return <Players players={players} />;
       default:
         return (
           <SelectPlayer
@@ -83,12 +92,15 @@ const App: React.FC = () => {
     <>
       <nav className={styles.navbar}>
         <p>RPG</p>
+        <button onClick={() => setActiveComponent(PLAYERS)}>
+          <PlayersOnline players={players} />
+        </button>
         <button onClick={() => setActiveComponent(CHAT)}>Chat</button>
         <button onClick={() => setActiveComponent(PLAYER_DETAILS)}>
-          Player Details
+          Player
         </button>
         <button onClick={() => setActiveComponent(PLAYER_SELECT)}>
-          Player Select
+          Select
         </button>
       </nav>
       {renderComponent()}
