@@ -9,3 +9,6 @@ Server
     - Start with in memory, then move to long term storage (MongoDB?)
 - Setup private rooms
     - This rooms will be games with multiple players and player 2 player private chats
+- Compress chat history
+    - Maybe ChatGPT could send a brief summary of the status of the game in a response to be used on subsuquent requests so the who chat history does not have to be used
+    - Maybe we can save the history to the file, and update that file in the OpenAI account to use as context instead of a chat history in API requests?
