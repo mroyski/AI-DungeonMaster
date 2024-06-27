@@ -8,18 +8,20 @@
 
 .playerName {
   font-size: 24px;
-  color: #00adb5;
+  color: #ff5252;
   margin-bottom: 10px;
 }
 
 .playerDescription {
   font-size: 18px;
   line-height: 1.6;
+  color: #ffffff;
 }
 
 .primaryAbility {
   font-size: 18px;
   margin-top: 10px;
+  color: #fa8072;
 }
 
 .error {

@@ -19,13 +19,14 @@ body {
 .navbar button {
   margin-left: 10px;
   padding: 8px 16px;
-  background-color: #7e57c2;
+  background-color: #ff5252;
   color: white;
   border: none;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  border-radius: 20px;
 }
 
 .navbar button:hover {
-  background-color: #5e35b1;
+  background-color: #fa8072;
 }

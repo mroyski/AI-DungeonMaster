@@ -1,6 +1,6 @@
 .selectPlayer {
-  background-color: #222831;
-  border: 2px solid #393e46;
+  background-color: #222831; /* dark grey background */
+  border: 2px solid #393e46; /* slightly lighter border */
   padding: 16px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
@@ -10,7 +10,7 @@
 }
 
 .playerButton {
-  background-color: #00adb5;
+  background-color: #ff5252;
   color: #fff;
   border: none;
   padding: 10px 20px;
@@ -21,7 +21,7 @@
 }
 
 .playerButton:hover {
-  background-color: #eeeeee;
+  background-color: #fa8072;
 }
 
 .playerDescription {
