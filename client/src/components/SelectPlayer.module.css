@@ -1,8 +1,8 @@
 .selectPlayer {
-  background-color: #f0e8d8;
-  border: 2px solid #5e503f;
+  background-color: #222831;
+  border: 2px solid #393e46;
   padding: 16px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
 .playerOption {
@@ -10,26 +10,28 @@
 }
 
 .playerButton {
-  background-color: #8b4513;
+  background-color: #00adb5;
   color: #fff;
   border: none;
   padding: 10px 20px;
   font-size: 16px;
   cursor: pointer;
   border-radius: 4px;
+  transition: background-color 0.3s ease;
 }
 
 .playerButton:hover {
-  background-color: #5e503f;
+  background-color: #eeeeee;
 }
 
 .playerDescription {
   font-size: 14px;
   margin-top: 8px;
+  color: #ffffff;
 }
 
 .hr {
   border: none;
-  border-top: 1px solid #5e503f;
+  border-top: 1px solid #393e46;
   margin-top: 12px;
 }

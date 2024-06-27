@@ -1,14 +1,14 @@
 .playerDetails {
-  background-color: #f0e8d8;
-  border: 2px solid #5e503f;
+  background-color: #222831;
+  border: 2px solid #393e46;
   padding: 16px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
   height: calc(100vh - 110px);
 }
 
 .playerName {
   font-size: 24px;
-  color: #8b4513;
+  color: #00adb5;
   margin-bottom: 10px;
 }
 
@@ -23,7 +23,7 @@
 }
 
 .error {
-  color: #b30000;
+  color: #ff7f50;
   font-size: 18px;
   font-weight: bold;
   margin-top: 20px;
