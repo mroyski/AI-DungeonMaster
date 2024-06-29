@@ -10,7 +10,7 @@ import styles from './SelectPlayer.module.css';
 const images = require.context(
   '../assets/classSymbols',
   false,
-  /\.(png|jpe?g|svg|tif)$/
+  /\.(png|jpe?g|svg)$/
 );
 
 const SelectPlayer: React.FC<{
