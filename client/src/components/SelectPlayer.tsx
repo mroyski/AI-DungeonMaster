@@ -8,7 +8,7 @@ import {
 import styles from './SelectPlayer.module.css';
 
 const images = require.context(
-  '../assets/classSymbols',
+  '../assets/class-symbols',
   false,
   /\.(png|jpe?g|svg)$/
 );
