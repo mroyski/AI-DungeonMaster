@@ -1,6 +1,6 @@
 .selectPlayer {
-  background-color: #222831; /* dark grey background */
-  border: 2px solid #393e46; /* slightly lighter border */
+  background-color: #222831;
+  border: 2px solid #393e46;
   padding: 16px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
@@ -34,4 +34,12 @@
   border: none;
   border-top: 1px solid #393e46;
   margin-top: 12px;
+}
+
+.symbol {
+  width: 35px;
+  height: 35px;
+  border-radius: 100%;
+  margin-right: 12px;
+  vertical-align: bottom;
 }

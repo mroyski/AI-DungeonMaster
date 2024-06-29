@@ -7,6 +7,7 @@ export interface PlayerClass {
   name: string;
   description: string;
   primaryAbility: string;
+  symbol: string;
 }
 
 const barbarian: PlayerClass = {
@@ -14,12 +15,14 @@ const barbarian: PlayerClass = {
   description:
     'A fierce warrior of primitive background who can enter a battle rag',
   primaryAbility: 'Strength',
+  symbol: 'Barbarian.jpg',
 };
 
 const bard: PlayerClass = {
   name: 'Bard',
   description: 'An inspiring magician whose power echoes the music of creation',
   primaryAbility: 'Charisma',
+  symbol: 'Bard.jpg',
 };
 
 const cleric: PlayerClass = {
@@ -27,6 +30,7 @@ const cleric: PlayerClass = {
   description:
     'A priestly champion who wields divine magic in service of a higher power',
   primaryAbility: 'Wisdom',
+  symbol: 'Cleric.jpg',
 };
 
 const druid: PlayerClass = {
@@ -34,6 +38,7 @@ const druid: PlayerClass = {
   description:
     'A priest of the Old Faith, wielding the powers of nature — moonlight and plant growth, fire and lightning — and adopting animal forms',
   primaryAbility: 'Wisdom',
+  symbol: 'Druid.jpg',
 };
 
 const fighter: PlayerClass = {
@@ -41,6 +46,7 @@ const fighter: PlayerClass = {
   description:
     'A master of martial combat, skilled with a variety of weapons and armor',
   primaryAbility: 'Stength or Dexterity',
+  symbol: 'Fighter.jpg',
 };
 
 const monk: PlayerClass = {
@@ -48,12 +54,14 @@ const monk: PlayerClass = {
   description:
     'A master of martial arts, harnessing the power of the body in pursuit of physical and spiritual perfection',
   primaryAbility: 'Dexterity & Wisdom',
+  symbol: 'Monk.jpg',
 };
 
 const paladin: PlayerClass = {
   name: 'Paladin',
   description: 'A holy warrior bound to a sacred oath',
   primaryAbility: 'Strength & Charisma',
+  symbol: 'Paladin.jpg',
 };
 
 const ranger: PlayerClass = {
@@ -61,6 +69,7 @@ const ranger: PlayerClass = {
   description:
     'A warrior who uses martial prowess and nature magic to combat threats on the edges of civilization',
   primaryAbility: 'Dexterity & Wisdom',
+  symbol: 'Ranger.jpg',
 };
 
 const rogue: PlayerClass = {
@@ -68,6 +77,7 @@ const rogue: PlayerClass = {
   description:
     'A scoundrel who uses stealth and trickery to overcome obstacles and enemies',
   primaryAbility: 'Dexterity',
+  symbol: 'Rogue.jpg',
 };
 
 const sorcerer: PlayerClass = {
@@ -75,6 +85,7 @@ const sorcerer: PlayerClass = {
   description:
     'A spellcaster who draws on inherent magic from a gift or bloodlin',
   primaryAbility: 'Charisma',
+  symbol: 'Sorcerer.jpg',
 };
 
 const warlock: PlayerClass = {
@@ -82,6 +93,7 @@ const warlock: PlayerClass = {
   description:
     'A wielder of magic that is derived from a bargain with an extraplanar entity',
   primaryAbility: 'Charisma',
+  symbol: 'Warlock.jpg',
 };
 
 const wizard: PlayerClass = {
@@ -89,6 +101,7 @@ const wizard: PlayerClass = {
   description:
     'A scholarly magic-user capable of manipulating the structures of reality',
   primaryAbility: 'Intelligence',
+  symbol: 'Wizard.jpg',
 };
 
 export const playerClasses = [

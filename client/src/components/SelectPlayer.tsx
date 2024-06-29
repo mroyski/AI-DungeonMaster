@@ -7,6 +7,12 @@ import {
 } from '../interfaces/Player.interface';
 import styles from './SelectPlayer.module.css';
 
+const images = require.context(
+  '../assets/classSymbols',
+  false,
+  /\.(png|jpe?g|svg|tif)$/
+);
+
 const SelectPlayer: React.FC<{
   setPlayer: Dispatch<SetStateAction<Player | null>>;
   returnToChat: any;
@@ -24,6 +30,11 @@ const SelectPlayer: React.FC<{
     <div className={styles.selectPlayer}>
       {playerClasses.map((c) => (
         <div key={c.name} className={styles.playerOption}>
+          <img
+            className={styles.symbol}
+            src={images(`./${c.symbol}`)}
+            alt={c.name}
+          />
           <button
             className={styles.playerButton}
             onClick={() => handleSelectPlayer(c)}
