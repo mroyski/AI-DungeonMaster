@@ -21,6 +21,7 @@ const SelectPlayer: React.FC<{
     const selectedPlayer: Player = {
       name: e.name,
       playerClass: e,
+      userID: 'xyz456',
     };
     setPlayer(selectedPlayer);
     returnToChat();

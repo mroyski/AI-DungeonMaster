@@ -1,12 +1,20 @@
 const rooms = ['1', '2', '3'];
 
-const Rooms: React.FC<{ socket: any; player: any; setRoom: any }> = ({
-  socket,
-  player,
-  setRoom,
-}) => {
+const Rooms: React.FC<{
+  socket: any;
+  player: any;
+  currentRoom: any;
+  setRoom: any;
+}> = ({ socket, player, currentRoom, setRoom }) => {
   const joinRoom = (room: string) => {
-    socket.emit('join room', { room, name: player.name });
+    if (currentRoom)
+      socket.emit('leave room', { room: currentRoom, name: player.name });
+
+    socket.emit('join room', {
+      room,
+      name: player.name,
+      userID: player.userID,
+    });
     setRoom(room);
   };
 

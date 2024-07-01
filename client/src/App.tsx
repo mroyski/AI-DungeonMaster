@@ -56,6 +56,11 @@ const App: React.FC = () => {
         }
       );
 
+      socket.on('chat history', ({ chatHistory }) => {
+        console.log('chat history', chatHistory);
+        setMessages(chatHistory);
+      });
+
       socket.on('players', (players: any[]) => {
         console.log('players: ', players);
         const otherPlayers = players.filter((p) => p.id !== socket.id);
@@ -102,7 +107,14 @@ const App: React.FC = () => {
       case 'players':
         return <Players players={players} />;
       case 'rooms':
-        return <Rooms socket={socket} player={player} setRoom={setRoom} />;
+        return (
+          <Rooms
+            socket={socket}
+            player={player}
+            setRoom={setRoom}
+            currentRoom={room}
+          />
+        );
       default:
         return (
           <SelectPlayer

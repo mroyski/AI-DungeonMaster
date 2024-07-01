@@ -60,15 +60,13 @@ Before we begin playing, I would like you to provide my three adventure options.
   return await messageAgent(initialMessage);
 };
 
-const chatHistory = [];
+const chatHistory = {
+  1: [],
+  2: [],
+  3: [],
+};
 
-const sessions = [
-  {
-    sessionID: '9d4f10cb-12ac-44e6-b48d-8b779ce89143',
-    userID: 'xyz456',
-    name: 'sharkgun',
-  },
-];
+const sessions = [];
 
 io.use((socket, next) => {
   const sessionID = socket.handshake.auth.sessionID;
@@ -117,20 +115,20 @@ io.on('connection', (socket) => {
   });
 
   socket.on('chat message', ({ message, sender, room }) => {
-    chatHistory.push({ message, sender });
+    chatHistory[room].push({ message, sender });
     io.to(room).emit('chat message', { message, sender });
 
     if (message.substring(0, 3).toLowerCase() !== '/dm') return;
 
     if (interactionHistory.length === 0) {
       startGame().then((response) => {
-        io.emit('chat message', response);
-        chatHistory.push({ sender: 'DM', message: response });
+        io.to(room).emit('chat message', response);
+        chatHistory[room].push({ sender: 'DM', message: response });
       });
     } else {
       messageAgent(message).then((response) => {
-        io.emit('chat message', response);
-        chatHistory.push({ sender: 'DM', message: response });
+        io.to(room).emit('chat message', response);
+        chatHistory[room].push({ sender: 'DM', message: response });
       });
     }
   });
@@ -138,6 +136,13 @@ io.on('connection', (socket) => {
   socket.on('join room', ({ room, name }) => {
     socket.join(room);
     console.log(`${name} joined room: ${room}`);
+    console.log('history:', chatHistory[room]);
+    io.to(room).emit('chat history', { chatHistory: chatHistory[room] });
+  });
+
+  socket.on('leave room', ({ room, name }) => {
+    socket.leave(room);
+    console.log(`${name} left room: ${room}`);
   });
 
   socket.on('disconnect', () => {

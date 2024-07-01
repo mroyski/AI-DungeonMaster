@@ -1,6 +1,7 @@
 export interface Player {
   name: string;
   playerClass: PlayerClass;
+  userID: string;
 }
 
 export interface PlayerClass {
