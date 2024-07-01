@@ -1,5 +1,6 @@
 require('dotenv-flow').config();
 const express = require('express');
+const { randomUUID } = require('node:crypto');
 const { createServer } = require('node:http');
 const { join } = require('node:path');
 const { default: OpenAI } = require('openai');
@@ -61,17 +62,46 @@ Before we begin playing, I would like you to provide my three adventure options.
 
 const chatHistory = [];
 
+const sessions = [
+  {
+    sessionID: '9d4f10cb-12ac-44e6-b48d-8b779ce89143',
+    userID: 'xyz456',
+    name: 'sharkgun',
+  },
+];
+
 io.use((socket, next) => {
+  const sessionID = socket.handshake.auth.sessionID;
+  if (sessionID) {
+    // find existing session
+    const session = sessions.find((s) => s.sessionID === sessionID);
+    if (session) {
+      socket.sessionID = sessionID;
+      socket.userID = session.userID;
+      socket.name = session.name;
+      return next();
+    }
+  }
+
   const name = socket.handshake.auth.name;
   if (!name) {
     return next(new Error('invalid name'));
   }
-  console.log(`Player ${name} ${socket.id} connected.`);
+
+  // create new session
+  socket.sessionID = randomUUID();
+  socket.userID = randomUUID();
   socket.name = name;
   next();
 });
 
 io.on('connection', (socket) => {
+  socket.emit('session', {
+    sessionID: socket.sessionID,
+    userID: socket.userID,
+    name: socket.name,
+  });
+
   const players = [];
   for (let [id, socket] of io.of('/').sockets) {
     players.push({
@@ -86,20 +116,28 @@ io.on('connection', (socket) => {
     name: socket.handshake.auth.name,
   });
 
-  socket.on('chat message', ({ message, sender }) => {
-    io.emit('chat message', { message, sender });
+  socket.on('chat message', ({ message, sender, room }) => {
+    chatHistory.push({ message, sender });
+    io.to(room).emit('chat message', { message, sender });
 
     if (message.substring(0, 3).toLowerCase() !== '/dm') return;
 
     if (interactionHistory.length === 0) {
       startGame().then((response) => {
         io.emit('chat message', response);
+        chatHistory.push({ sender: 'DM', message: response });
       });
     } else {
       messageAgent(message).then((response) => {
         io.emit('chat message', response);
+        chatHistory.push({ sender: 'DM', message: response });
       });
     }
+  });
+
+  socket.on('join room', ({ room, name }) => {
+    socket.join(room);
+    console.log(`${name} joined room: ${room}`);
   });
 
   socket.on('disconnect', () => {

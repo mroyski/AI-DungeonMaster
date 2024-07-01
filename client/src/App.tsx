@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import io from 'socket.io-client';
+import io, { Socket } from 'socket.io-client';
 import Chat from './components/Chat';
 import { usePlayerContext } from './lib/PlayerContext';
 import SelectPlayer from './components/SelectPlayer';
@@ -8,6 +8,7 @@ import styles from './App.module.css';
 import { Player } from './interfaces/Player.interface';
 import Players from './components/Players';
 import PlayersOnline from './components/PlayersOnline';
+import Rooms from './components/Rooms';
 
 const SERVER_URL = process.env.REACT_APP_SERVER_URL || 'http://localhost:8080';
 
@@ -15,23 +16,45 @@ const PLAYERS = 'players';
 const PLAYER_SELECT = 'playerselect';
 const PLAYER_DETAILS = 'playerdetails';
 const CHAT = 'chat';
+const ROOMS = 'rooms';
+
+// Extend the Socket interface
+interface CustomSocket extends Socket {
+  userID?: string;
+}
 
 const App: React.FC = () => {
   const { player, setPlayer, players, setPlayers, messages, setMessages } =
     usePlayerContext();
-  const [socket, setSocket] = useState<any>(null);
+  const [socket, setSocket] = useState<CustomSocket | null>(null);
   const [activeComponent, setActiveComponent] = useState(PLAYER_SELECT);
+  const [room, setRoom] = useState();
 
   useEffect(() => {
     if (player) {
-      const socket = io(SERVER_URL, {
+      const socket: CustomSocket = io(SERVER_URL, {
         withCredentials: true,
-        auth: { name: player.name },
+        auth: {
+          name: player.name,
+          sessionID: localStorage.getItem('sessionID'),
+          userID: localStorage.getItem('userID'),
+        },
       });
 
-      socket.on('chat message', (data: { message: string; sender: string }) => {
-        setMessages((prevMessages) => [...prevMessages, data]);
+      socket.on('session', ({ sessionID, userID, name }) => {
+        socket.auth = { sessionID, name };
+        localStorage.setItem('sessionID', sessionID);
+        localStorage.setItem('userID', userID);
+        localStorage.setItem('name', name);
+        socket.userID = userID;
       });
+
+      socket.on(
+        'chat message',
+        (data: { message: string; sender: string; room: string }) => {
+          setMessages((prevMessages) => [...prevMessages, data]);
+        }
+      );
 
       socket.on('players', (players: any[]) => {
         console.log('players: ', players);
@@ -57,7 +80,7 @@ const App: React.FC = () => {
   ) => {
     e.preventDefault();
     if (message.trim() !== '' && socket && player) {
-      socket.emit('chat message', { message, sender: player.name });
+      socket.emit('chat message', { message, sender: player.name, room: room });
     }
   };
 
@@ -78,6 +101,8 @@ const App: React.FC = () => {
         );
       case 'players':
         return <Players players={players} />;
+      case 'rooms':
+        return <Rooms socket={socket} player={player} setRoom={setRoom} />;
       default:
         return (
           <SelectPlayer
@@ -102,6 +127,7 @@ const App: React.FC = () => {
         <button onClick={() => setActiveComponent(PLAYER_SELECT)}>
           Select
         </button>
+        <button onClick={() => setActiveComponent(ROOMS)}>Rooms</button>
       </nav>
       {renderComponent()}
     </>
