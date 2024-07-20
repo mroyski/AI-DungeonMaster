@@ -28,6 +28,7 @@ const App: React.FC = () => {
     usePlayerContext();
   const [socket, setSocket] = useState<CustomSocket | null>(null);
   const [activeComponent, setActiveComponent] = useState(PLAYER_SELECT);
+  const [allRooms, setAllRooms] = useState([]);
   const [room, setRoom] = useState();
 
   useEffect(() => {
@@ -49,9 +50,15 @@ const App: React.FC = () => {
         socket.userID = userID;
       });
 
+      socket.on('all rooms', (data) => {
+        setAllRooms(data);
+      });
+
       socket.on(
         'chat message',
-        (data: { message: string; sender: string; room: string }) => {
+        (data: { text: string; player: string; room: string }) => {
+          console.log('DATA:', data)
+          console.log('TEXT', data.text);
           setMessages((prevMessages) => [...prevMessages, data]);
         }
       );
@@ -81,11 +88,11 @@ const App: React.FC = () => {
 
   const sendMessage = (
     e: React.FormEvent<HTMLFormElement>,
-    message: string
+    text: string
   ) => {
     e.preventDefault();
-    if (message.trim() !== '' && socket && player) {
-      socket.emit('chat message', { message, sender: player.name, room: room });
+    if (text.trim() !== '' && socket && player) {
+      socket.emit('chat message', { text, player: player.name, room: room });
     }
   };
 
@@ -113,6 +120,7 @@ const App: React.FC = () => {
             player={player}
             setRoom={setRoom}
             currentRoom={room}
+            allRooms={allRooms}
           />
         );
       default:

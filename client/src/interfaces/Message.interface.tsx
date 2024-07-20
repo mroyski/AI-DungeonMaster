@@ -1,5 +1,5 @@
 export interface Message {
-  message: string;
-  sender: string;
+  text: string;
+  player: string;
   room: string;
 }
