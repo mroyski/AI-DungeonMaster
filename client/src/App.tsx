@@ -57,7 +57,7 @@ const App: React.FC = () => {
       socket.on(
         'chat message',
         (data: { text: string; player: string; room: string }) => {
-          console.log('DATA:', data)
+          console.log('DATA:', data);
           console.log('TEXT', data.text);
           setMessages((prevMessages) => [...prevMessages, data]);
         }
@@ -86,10 +86,7 @@ const App: React.FC = () => {
     }
   }, [player, setMessages, setPlayers]);
 
-  const sendMessage = (
-    e: React.FormEvent<HTMLFormElement>,
-    text: string
-  ) => {
+  const sendMessage = (e: React.FormEvent<HTMLFormElement>, text: string) => {
     e.preventDefault();
     if (text.trim() !== '' && socket && player) {
       socket.emit('chat message', { text, player: player.name, room: room });
@@ -107,13 +104,13 @@ const App: React.FC = () => {
             returnToChat={() => setActiveComponent(CHAT)}
           />
         );
-      case 'chat':
+      case CHAT:
         return (
           <Chat messages={messages} sendMessage={sendMessage} player={player} />
         );
-      case 'players':
+      case PLAYERS:
         return <Players players={players} />;
-      case 'rooms':
+      case ROOMS:
         return (
           <Rooms
             socket={socket}
