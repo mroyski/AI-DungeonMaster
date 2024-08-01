@@ -7,6 +7,8 @@ const { default: OpenAI } = require('openai');
 const { connectInMemory } = require('./db/seed');
 const Room = require('./models/room');
 const Message = require('./models/message');
+const Player = require('./models/player');
+const cors = require('cors');
 
 const PORT = process.env.PORT || 8080;
 const app = express();
@@ -149,9 +151,9 @@ connectInMemory().then(() => {
       socket.join(room);
       console.log(`${name} joined room: ${room}`);
 
-      let chatHistory = await Message.find({ room: room });
+      const chatHistory = await Message.find({ room: room });
 
-      io.to(room).emit('chat history', { chatHistory });
+      socket.emit('chat history', { chatHistory }, socket.id);
     });
 
     socket.on('leave room', ({ room, name }) => {
@@ -179,6 +181,14 @@ connectInMemory().then(() => {
     socket.onAny((event, ...args) => {
       console.log(event, args);
     });
+  });
+
+  app.use(cors());
+
+  app.get('/players', async (req, res) => {
+    Player.find()
+      .populate('playerClass')
+      .then((data) => res.send(data));
   });
 
   server.listen(PORT, () =>
