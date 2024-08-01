@@ -9,7 +9,7 @@ const playerSchema = new mongoose.Schema(
       ref: 'PlayerClass',
       required: true,
     },
-    // room: { type: mongoose.Schema.Types.ObjectId, ref: 'Room' },
+    room: { type: mongoose.Schema.Types.ObjectId, ref: 'Room' },
   },
   { timestamps: true }
 );

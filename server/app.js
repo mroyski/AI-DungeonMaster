@@ -147,9 +147,22 @@ connectInMemory().then(() => {
       // }
     });
 
-    socket.on('join room', async ({ room, name }) => {
+    socket.on('join room', async ({ room, player }) => {
       socket.join(room);
-      console.log(`${name} joined room: ${room}`);
+      console.log(`${player.name} joined room: ${room}`);
+
+      const roomToJoin = await Room.findById(room);
+      const playerInRoom = await Room.findOne({
+        _id: room,
+        players: player,
+      });
+      console.log('playerInRoom?:', playerInRoom);
+
+      if (!playerInRoom) {
+        roomToJoin.players.push(player);
+      }
+
+      await roomToJoin.save();
 
       const chatHistory = await Message.find({ room: room }).populate('player');
 

@@ -17,7 +17,7 @@ const Rooms: React.FC<{
 
     socket.emit('join room', {
       room,
-      name: player.name,
+      player: player,
       userID: player.userID,
     });
     setRoom(room);
