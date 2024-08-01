@@ -93,16 +93,18 @@ const App: React.FC = () => {
     }
   };
 
+  const returnToChat = () => {
+    setMessages([]);
+    setActiveComponent(CHAT);
+  };
+
   const renderComponent = () => {
     switch (activeComponent) {
       case PLAYER_DETAILS:
         return <PlayerDetails player={player} />;
       case PLAYER_SELECT:
         return (
-          <SelectPlayer
-            setPlayer={setPlayer}
-            returnToChat={() => setActiveComponent(CHAT)}
-          />
+          <SelectPlayer setPlayer={setPlayer} returnToChat={returnToChat} />
         );
       case CHAT:
         return (
@@ -118,6 +120,7 @@ const App: React.FC = () => {
             setRoom={setRoom}
             currentRoom={room}
             allRooms={allRooms}
+            returnToChat={returnToChat}
           />
         );
       default:

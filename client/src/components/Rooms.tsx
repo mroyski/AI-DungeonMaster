@@ -9,7 +9,8 @@ const Rooms: React.FC<{
   currentRoom: any;
   setRoom: any;
   allRooms: Room[];
-}> = ({ socket, player, currentRoom, setRoom, allRooms }) => {
+  returnToChat: any;
+}> = ({ socket, player, currentRoom, setRoom, allRooms, returnToChat }) => {
   const joinRoom = (room: string) => {
     if (currentRoom)
       socket.emit('leave room', { room: currentRoom, name: player.name });
@@ -20,6 +21,7 @@ const Rooms: React.FC<{
       userID: player.userID,
     });
     setRoom(room);
+    returnToChat();
   };
 
   if (!player) return <p>Select Player</p>;
