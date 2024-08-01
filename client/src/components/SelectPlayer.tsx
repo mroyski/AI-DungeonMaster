@@ -13,6 +13,8 @@ const images = require.context(
   /\.(png|jpe?g|svg)$/
 );
 
+const serverURL = process.env.REACT_APP_SERVER_URL;
+
 const SelectPlayer: React.FC<{
   setPlayer: Dispatch<SetStateAction<Player | null>>;
   returnToChat: any;
@@ -20,7 +22,7 @@ const SelectPlayer: React.FC<{
   const [players, setPlayers] = useState<Player[]>([]);
 
   useEffect(() => {
-    fetch('http://localhost:8080/players')
+    fetch(`${serverURL}/players`)
       .then((res) => res.json())
       .then((res) => setPlayers(res))
       .catch((error) => {
@@ -48,7 +50,9 @@ const SelectPlayer: React.FC<{
           >
             {c.name}
           </button>
-          <p className={styles.playerDescription}>{c.playerClass.name}: {c.playerClass.description}</p>
+          <p className={styles.playerDescription}>
+            {c.playerClass.name}: {c.playerClass.description}
+          </p>
           <hr className={styles.hr} />
         </div>
       ))}
