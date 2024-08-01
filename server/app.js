@@ -1,8 +1,14 @@
 require('dotenv-flow').config();
 const express = require('express');
+const { randomUUID } = require('node:crypto');
 const { createServer } = require('node:http');
 const { join } = require('node:path');
 const { default: OpenAI } = require('openai');
+const { connectInMemory } = require('./db/seed');
+const Room = require('./models/room');
+const Message = require('./models/message');
+const Player = require('./models/player');
+const cors = require('cors');
 
 const PORT = process.env.PORT || 8080;
 const app = express();
@@ -59,54 +65,46 @@ Before we begin playing, I would like you to provide my three adventure options.
   return await messageAgent(initialMessage);
 };
 
-const chatHistory = [];
+// const chatHistory = {
+//   1: [],
+//   2: [],
+//   3: [],
+// };
 
-io.use((socket, next) => {
-  const name = socket.handshake.auth.name;
-  if (!name) {
-    return next(new Error('invalid name'));
-  }
-  console.log(`Player ${name} ${socket.id} connected.`);
-  socket.name = name;
-  next();
-});
+const sessions = [];
 
-io.on('connection', (socket) => {
-  const players = [];
-  for (let [id, socket] of io.of('/').sockets) {
-    players.push({
-      id: id,
-      name: socket.handshake.auth.name,
-    });
-  }
-  io.emit('players', players);
-
-  socket.broadcast.emit('player connected', {
-    id: socket.id,
-    name: socket.handshake.auth.name,
-  });
-
-  socket.on('chat message', ({ message, sender }) => {
-    io.emit('chat message', { message, sender });
-
-    if (message.substring(0, 3).toLowerCase() !== '/dm') return;
-
-    if (interactionHistory.length === 0) {
-      startGame().then((response) => {
-        io.emit('chat message', response);
-      });
-    } else {
-      messageAgent(message).then((response) => {
-        io.emit('chat message', response);
-      });
+connectInMemory().then(() => {
+  io.use((socket, next) => {
+    const sessionID = socket.handshake.auth.sessionID;
+    if (sessionID) {
+      // find existing session
+      const session = sessions.find((s) => s.sessionID === sessionID);
+      if (session) {
+        socket.sessionID = sessionID;
+        socket.userID = session.userID;
+        socket.name = session.name;
+        return next();
+      }
     }
+
+    const name = socket.handshake.auth.name;
+    if (!name) {
+      return next(new Error('invalid name'));
+    }
+
+    // create new session
+    socket.sessionID = randomUUID();
+    socket.userID = randomUUID();
+    socket.name = name;
+    next();
   });
 
-  socket.on('disconnect', () => {
-    console.log(
-      `Player ${socket.id} - ${socket.handshake.auth.name} disconnected.`
-    );
-    io.emit('player disconnected', socket.id);
+  io.on('connection', async (socket) => {
+    socket.emit('session', {
+      sessionID: socket.sessionID,
+      userID: socket.userID,
+      name: socket.name,
+    });
 
     const players = [];
     for (let [id, socket] of io.of('/').sockets) {
@@ -115,15 +113,98 @@ io.on('connection', (socket) => {
         name: socket.handshake.auth.name,
       });
     }
-
     io.emit('players', players);
+
+    let allRooms = await Room.find();
+    allRooms = allRooms.map((room) => {
+      return { id: room._id.toString(), name: room.name };
+    });
+
+    socket.emit('all rooms', allRooms);
+
+    socket.broadcast.emit('player connected', {
+      id: socket.id,
+      name: socket.handshake.auth.name,
+    });
+
+    socket.on('chat message', async ({ text, player, room }) => {
+      // need to seed players/users and fetch them in frontend to be able to save them here
+      await new Message({ text, player, room }).save();
+      io.to(room).emit('chat message', { text, player, room });
+
+      if (text.substring(0, 3).toLowerCase() !== '/dm') return;
+
+      // if (interactionHistory.length === 0) {
+      //   startGame().then((response) => {
+      //     io.to(room).emit('chat message', response);
+      //     chatHistory[room].push({ sender: 'DM', message: response });
+      //   });
+      // } else {
+      //   messageAgent(message).then((response) => {
+      //     io.to(room).emit('chat message', response);
+      //     chatHistory[room].push({ sender: 'DM', message: response });
+      //   });
+      // }
+    });
+
+    socket.on('join room', async ({ room, player }) => {
+      socket.join(room);
+      console.log(`${player.name} joined room: ${room}`);
+
+      const roomToJoin = await Room.findById(room);
+      const playerInRoom = await Room.findOne({
+        _id: room,
+        players: player,
+      });
+      console.log('playerInRoom?:', playerInRoom);
+
+      if (!playerInRoom) {
+        roomToJoin.players.push(player);
+      }
+
+      await roomToJoin.save();
+
+      const chatHistory = await Message.find({ room: room }).populate('player');
+
+      socket.emit('chat history', { chatHistory }, socket.id);
+    });
+
+    socket.on('leave room', ({ room, name }) => {
+      socket.leave(room);
+      console.log(`${name} left room: ${room}`);
+    });
+
+    socket.on('disconnect', () => {
+      console.log(
+        `Player ${socket.id} - ${socket.handshake.auth.name} disconnected.`
+      );
+      io.emit('player disconnected', socket.id);
+
+      const players = [];
+      for (let [id, socket] of io.of('/').sockets) {
+        players.push({
+          id: id,
+          name: socket.handshake.auth.name,
+        });
+      }
+
+      io.emit('players', players);
+    });
+
+    socket.onAny((event, ...args) => {
+      console.log(event, args);
+    });
   });
 
-  socket.onAny((event, ...args) => {
-    console.log(event, args);
+  app.use(cors());
+
+  app.get('/players', async (req, res) => {
+    Player.find()
+      .populate('playerClass')
+      .then((data) => res.send(data));
   });
+
+  server.listen(PORT, () =>
+    console.log(`server running at http://localhost:${PORT}`)
+  );
 });
-
-server.listen(PORT, () =>
-  console.log(`server running at http://localhost:${PORT}`)
-);

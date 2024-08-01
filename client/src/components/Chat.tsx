@@ -5,7 +5,7 @@ import { Message } from '../interfaces/Message.interface';
 
 interface Props {
   messages: Array<Message>;
-  sendMessage: (e: React.FormEvent<HTMLFormElement>, message: string) => void;
+  sendMessage: (e: React.FormEvent<HTMLFormElement>, text: string) => void;
   player: Player | null;
 }
 
@@ -45,7 +45,7 @@ const Chat: React.FC<Props> = ({ messages, sendMessage, player }) => {
                 index % 2 === 0 ? styles.messageOdd : styles.messageEven
               }
             >
-              {msg.sender}: {msg.message}
+              {msg.player.name}: {msg.text}
             </li>
           ))}
           <div ref={messagesEndRef} />

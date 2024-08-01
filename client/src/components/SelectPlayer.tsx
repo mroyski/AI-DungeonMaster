@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Dispatch, SetStateAction } from 'react';
 import {
   Player,
@@ -13,26 +13,35 @@ const images = require.context(
   /\.(png|jpe?g|svg)$/
 );
 
+const serverURL = process.env.REACT_APP_SERVER_URL;
+
 const SelectPlayer: React.FC<{
   setPlayer: Dispatch<SetStateAction<Player | null>>;
   returnToChat: any;
 }> = ({ setPlayer, returnToChat }) => {
-  const handleSelectPlayer = (e: PlayerClass) => {
-    const selectedPlayer: Player = {
-      name: e.name,
-      playerClass: e,
-    };
-    setPlayer(selectedPlayer);
+  const [players, setPlayers] = useState<Player[]>([]);
+
+  useEffect(() => {
+    fetch(`${serverURL}/players`)
+      .then((res) => res.json())
+      .then((res) => setPlayers(res))
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []);
+
+  const handleSelectPlayer = (e: Player) => {
+    setPlayer(e);
     returnToChat();
   };
 
   return (
     <div className={styles.selectPlayer}>
-      {playerClasses.map((c) => (
+      {players.map((c) => (
         <div key={c.name} className={styles.playerOption}>
           <img
             className={styles.symbol}
-            src={images(`./${c.symbol}`)}
+            src={images(`./${c.playerClass.symbol}`)}
             alt={c.name}
           />
           <button
@@ -41,7 +50,9 @@ const SelectPlayer: React.FC<{
           >
             {c.name}
           </button>
-          <p className={styles.playerDescription}>{c.description}</p>
+          <p className={styles.playerDescription}>
+            {c.playerClass.name}: {c.playerClass.description}
+          </p>
           <hr className={styles.hr} />
         </div>
       ))}

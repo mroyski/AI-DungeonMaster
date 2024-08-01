@@ -1,4 +1,7 @@
+import { Player } from '../interfaces/Player.interface';
+
 export interface Message {
-  message: string;
-  sender: string;
+  text: string;
+  player: Player;
+  room: string;
 }
