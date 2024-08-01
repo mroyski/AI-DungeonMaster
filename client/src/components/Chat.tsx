@@ -45,7 +45,7 @@ const Chat: React.FC<Props> = ({ messages, sendMessage, player }) => {
                 index % 2 === 0 ? styles.messageOdd : styles.messageEven
               }
             >
-              {msg.player}: {msg.text}
+              {msg.player.name}: {msg.text}
             </li>
           ))}
           <div ref={messagesEndRef} />

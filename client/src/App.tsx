@@ -56,7 +56,7 @@ const App: React.FC = () => {
 
       socket.on(
         'chat message',
-        (data: { text: string; player: string; room: string }) => {
+        (data: { text: string; player: Player; room: string }) => {
           console.log('DATA:', data);
           console.log('TEXT', data.text);
           setMessages((prevMessages) => [...prevMessages, data]);
@@ -89,7 +89,7 @@ const App: React.FC = () => {
   const sendMessage = (e: React.FormEvent<HTMLFormElement>, text: string) => {
     e.preventDefault();
     if (text.trim() !== '' && socket && player) {
-      socket.emit('chat message', { text, player: player.name, room: room });
+      socket.emit('chat message', { text, player: player, room: room });
     }
   };
 

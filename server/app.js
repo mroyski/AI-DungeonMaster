@@ -129,7 +129,7 @@ connectInMemory().then(() => {
 
     socket.on('chat message', async ({ text, player, room }) => {
       // need to seed players/users and fetch them in frontend to be able to save them here
-      await new Message({ text, room }).save();
+      await new Message({ text, player, room }).save();
       io.to(room).emit('chat message', { text, player, room });
 
       if (text.substring(0, 3).toLowerCase() !== '/dm') return;
@@ -151,7 +151,7 @@ connectInMemory().then(() => {
       socket.join(room);
       console.log(`${name} joined room: ${room}`);
 
-      const chatHistory = await Message.find({ room: room });
+      const chatHistory = await Message.find({ room: room }).populate('player');
 
       socket.emit('chat history', { chatHistory }, socket.id);
     });
