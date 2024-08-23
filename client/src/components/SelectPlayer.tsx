@@ -18,7 +18,8 @@ const serverURL = process.env.REACT_APP_SERVER_URL;
 const SelectPlayer: React.FC<{
   setPlayer: Dispatch<SetStateAction<Player | null>>;
   returnToChat: any;
-}> = ({ setPlayer, returnToChat }) => {
+  returnToRooms: any;
+}> = ({ setPlayer, returnToChat, returnToRooms }) => {
   const [players, setPlayers] = useState<Player[]>([]);
 
   useEffect(() => {
@@ -32,7 +33,7 @@ const SelectPlayer: React.FC<{
 
   const handleSelectPlayer = (e: Player) => {
     setPlayer(e);
-    returnToChat();
+    returnToRooms();
   };
 
   return (

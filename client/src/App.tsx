@@ -98,13 +98,21 @@ const App: React.FC = () => {
     setActiveComponent(CHAT);
   };
 
+  const returnToRooms = () => {
+    setActiveComponent(ROOMS);
+  };
+
   const renderComponent = () => {
     switch (activeComponent) {
       case PLAYER_DETAILS:
         return <PlayerDetails player={player} />;
       case PLAYER_SELECT:
         return (
-          <SelectPlayer setPlayer={setPlayer} returnToChat={returnToChat} />
+          <SelectPlayer
+            setPlayer={setPlayer}
+            returnToChat={returnToChat}
+            returnToRooms={returnToRooms}
+          />
         );
       case CHAT:
         return (
@@ -128,6 +136,7 @@ const App: React.FC = () => {
           <SelectPlayer
             setPlayer={setPlayer}
             returnToChat={() => setActiveComponent(CHAT)}
+            returnToRooms={() => setActiveComponent(ROOMS)}
           />
         );
     }
