@@ -29,7 +29,7 @@ const messageAgent = async (message) => {
     interactionHistory.push({ role: 'system', content: message });
     const completion = await openai.chat.completions.create({
       messages: interactionHistory,
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-4o-mini',
     });
 
     const assistantMessage = completion.choices[0].message.content;
