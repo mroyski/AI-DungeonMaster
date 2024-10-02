@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
+import { usePlayerContext } from '../lib/PlayerContext';
 
-const Login: React.FC<{ returnToPlayerSelect: () => void }> = ({
-  returnToPlayerSelect,
-}) => {
+const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const { setLoggedIn } = usePlayerContext();
 
   const submitHandler = (e: React.FormEvent) => {
     e.preventDefault();
@@ -13,8 +13,10 @@ const Login: React.FC<{ returnToPlayerSelect: () => void }> = ({
 
     if (!emailInput.length || !passwordInput.length) return;
 
+    setLoggedIn(true);
+
     // loginHandler({ emailInput, passwordInput });
-    returnToPlayerSelect();
+    // returnToPlayerSelect();
     // clearForm();
   };
 

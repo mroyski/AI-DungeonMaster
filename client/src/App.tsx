@@ -10,6 +10,7 @@ import Players from './components/Players';
 import PlayersOnline from './components/PlayersOnline';
 import Rooms from './components/Rooms';
 import Login from './components/Login';
+import ProtectedComponent from './components/ProtectedComponent';
 
 const SERVER_URL = process.env.REACT_APP_SERVER_URL || 'http://localhost:8080';
 
@@ -26,8 +27,15 @@ interface CustomSocket extends Socket {
 }
 
 const App: React.FC = () => {
-  const { player, setPlayer, players, setPlayers, messages, setMessages } =
-    usePlayerContext();
+  const {
+    player,
+    setPlayer,
+    players,
+    setPlayers,
+    messages,
+    setMessages,
+    loggedIn,
+  } = usePlayerContext();
   const [socket, setSocket] = useState<CustomSocket | null>(null);
   const [activeComponent, setActiveComponent] = useState(LOGIN);
   const [allRooms, setAllRooms] = useState([]);
@@ -86,7 +94,7 @@ const App: React.FC = () => {
         socket.disconnect();
       };
     }
-  }, [player, setMessages, setPlayers]);
+  }, [player, setMessages, setPlayers, loggedIn]);
 
   const sendMessage = (e: React.FormEvent<HTMLFormElement>, text: string) => {
     e.preventDefault();
@@ -110,8 +118,8 @@ const App: React.FC = () => {
 
   const renderComponent = () => {
     switch (activeComponent) {
-      case LOGIN:
-        return <Login returnToPlayerSelect={returnToPlayerSelect} />;
+      // case LOGIN:
+      //   return <Login />;
       case PLAYER_DETAILS:
         return <PlayerDetails player={player} />;
       case PLAYER_SELECT:
@@ -140,14 +148,16 @@ const App: React.FC = () => {
           />
         );
       default:
-        return <Login returnToPlayerSelect={returnToPlayerSelect} />;
-      // return (
-      //   <SelectPlayer
-      //     setPlayer={setPlayer}
-      //     returnToChat={() => setActiveComponent(CHAT)}
-      //     returnToRooms={() => setActiveComponent(ROOMS)}
-      //   />
-      // );
+        // return <Login returnToPlayerSelect={returnToPlayerSelect} />;
+        return (
+          <ProtectedComponent>
+            <SelectPlayer
+              setPlayer={setPlayer}
+              returnToChat={() => setActiveComponent(CHAT)}
+              returnToRooms={() => setActiveComponent(ROOMS)}
+            />
+          </ProtectedComponent>
+        );
     }
   };
 
