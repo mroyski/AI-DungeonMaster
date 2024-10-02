@@ -9,9 +9,11 @@ import { Player } from './interfaces/Player.interface';
 import Players from './components/Players';
 import PlayersOnline from './components/PlayersOnline';
 import Rooms from './components/Rooms';
+import Login from './components/Login';
 
 const SERVER_URL = process.env.REACT_APP_SERVER_URL || 'http://localhost:8080';
 
+const LOGIN = 'login';
 const PLAYERS = 'players';
 const PLAYER_SELECT = 'playerselect';
 const PLAYER_DETAILS = 'playerdetails';
@@ -27,7 +29,7 @@ const App: React.FC = () => {
   const { player, setPlayer, players, setPlayers, messages, setMessages } =
     usePlayerContext();
   const [socket, setSocket] = useState<CustomSocket | null>(null);
-  const [activeComponent, setActiveComponent] = useState(PLAYER_SELECT);
+  const [activeComponent, setActiveComponent] = useState(LOGIN);
   const [allRooms, setAllRooms] = useState([]);
   const [room, setRoom] = useState();
 
@@ -93,6 +95,10 @@ const App: React.FC = () => {
     }
   };
 
+  const returnToPlayerSelect = () => {
+    setActiveComponent(PLAYER_SELECT);
+  };
+
   const returnToChat = () => {
     setMessages([]);
     setActiveComponent(CHAT);
@@ -104,6 +110,8 @@ const App: React.FC = () => {
 
   const renderComponent = () => {
     switch (activeComponent) {
+      case LOGIN:
+        return <Login returnToPlayerSelect={returnToPlayerSelect} />;
       case PLAYER_DETAILS:
         return <PlayerDetails player={player} />;
       case PLAYER_SELECT:
@@ -132,13 +140,14 @@ const App: React.FC = () => {
           />
         );
       default:
-        return (
-          <SelectPlayer
-            setPlayer={setPlayer}
-            returnToChat={() => setActiveComponent(CHAT)}
-            returnToRooms={() => setActiveComponent(ROOMS)}
-          />
-        );
+        return <Login returnToPlayerSelect={returnToPlayerSelect} />;
+      // return (
+      //   <SelectPlayer
+      //     setPlayer={setPlayer}
+      //     returnToChat={() => setActiveComponent(CHAT)}
+      //     returnToRooms={() => setActiveComponent(ROOMS)}
+      //   />
+      // );
     }
   };
 

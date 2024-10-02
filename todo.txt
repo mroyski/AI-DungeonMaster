@@ -13,3 +13,7 @@ Server
 - Compress chat history
     - Maybe ChatGPT could send a brief summary of the status of the game in a response to be used on subsuquent requests so the who chat history does not have to be used
     - Maybe we can save the history to the file, and update that file in the OpenAI account to use as context instead of a chat history in API requests?
+
+GENERAL
+- Add faux login to fetch default user and use that for player select
+    - this will enable development to start saving chat history
