@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { usePlayerContext } from '../lib/PlayerContext';
+import { useAuthContext } from '../lib/AuthContext';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { setLoggedIn } = usePlayerContext();
+  const { setLoggedIn } = useAuthContext();
 
   const submitHandler = (e: React.FormEvent) => {
     e.preventDefault();

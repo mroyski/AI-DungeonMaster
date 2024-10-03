@@ -10,7 +10,7 @@ import Players from './components/Players';
 import PlayersOnline from './components/PlayersOnline';
 import Rooms from './components/Rooms';
 import Login from './components/Login';
-import ProtectedComponent from './components/ProtectedComponent';
+import { useAuthContext } from './lib/AuthContext';
 
 const SERVER_URL = process.env.REACT_APP_SERVER_URL || 'http://localhost:8080';
 
@@ -27,22 +27,17 @@ interface CustomSocket extends Socket {
 }
 
 const App: React.FC = () => {
-  const {
-    player,
-    setPlayer,
-    players,
-    setPlayers,
-    messages,
-    setMessages,
-    loggedIn,
-  } = usePlayerContext();
+  const { player, setPlayer, players, setPlayers, messages, setMessages } =
+    usePlayerContext();
+  const { loggedIn } = useAuthContext();
+
   const [socket, setSocket] = useState<CustomSocket | null>(null);
-  const [activeComponent, setActiveComponent] = useState(LOGIN);
+  const [activeComponent, setActiveComponent] = useState(PLAYER_SELECT);
   const [allRooms, setAllRooms] = useState([]);
   const [room, setRoom] = useState();
 
   useEffect(() => {
-    if (player) {
+    if (player && loggedIn) {
       const socket: CustomSocket = io(SERVER_URL, {
         withCredentials: true,
         auth: {
@@ -103,10 +98,6 @@ const App: React.FC = () => {
     }
   };
 
-  const returnToPlayerSelect = () => {
-    setActiveComponent(PLAYER_SELECT);
-  };
-
   const returnToChat = () => {
     setMessages([]);
     setActiveComponent(CHAT);
@@ -117,9 +108,11 @@ const App: React.FC = () => {
   };
 
   const renderComponent = () => {
+    if (!loggedIn) return <Login />;
+
     switch (activeComponent) {
-      // case LOGIN:
-      //   return <Login />;
+      case LOGIN:
+        return <Login />;
       case PLAYER_DETAILS:
         return <PlayerDetails player={player} />;
       case PLAYER_SELECT:
@@ -148,15 +141,12 @@ const App: React.FC = () => {
           />
         );
       default:
-        // return <Login returnToPlayerSelect={returnToPlayerSelect} />;
         return (
-          <ProtectedComponent>
-            <SelectPlayer
-              setPlayer={setPlayer}
-              returnToChat={() => setActiveComponent(CHAT)}
-              returnToRooms={() => setActiveComponent(ROOMS)}
-            />
-          </ProtectedComponent>
+          <SelectPlayer
+            setPlayer={setPlayer}
+            returnToChat={returnToChat}
+            returnToRooms={returnToRooms}
+          />
         );
     }
   };

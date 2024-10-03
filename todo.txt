@@ -16,4 +16,5 @@ Server
 
 GENERAL
 - Add faux login to fetch default user and use that for player select
-    - this will enable development to start saving chat history
+    - this will enable development to start saving chat history - development
+- Add user context or integrate it with player context and configure it with login

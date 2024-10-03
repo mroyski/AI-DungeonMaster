@@ -17,8 +17,6 @@ interface PlayerContextType {
   setPlayers: Dispatch<SetStateAction<Player[]>>;
   messages: Message[];
   setMessages: Dispatch<SetStateAction<Message[]>>;
-  loggedIn: Boolean;
-  setLoggedIn: Dispatch<SetStateAction<Boolean>>;
 }
 
 const PlayerContext = createContext<PlayerContextType | null>(null);
@@ -27,7 +25,6 @@ const PlayerProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [player, setPlayer] = useState<Player | null>(null);
   const [players, setPlayers] = useState<Player[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [loggedIn, setLoggedIn] = useState<Boolean>(false);
 
   return (
     <PlayerContext.Provider
@@ -38,8 +35,6 @@ const PlayerProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         setPlayers,
         messages,
         setMessages,
-        loggedIn,
-        setLoggedIn,
       }}
     >
       {children}
