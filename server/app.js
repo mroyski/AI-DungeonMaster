@@ -200,14 +200,12 @@ connectInMemory().then(() => {
   app.use(cors());
   app.use(express.json());
 
-  // TODO: find actual players for user
   app.get('/users/:userId/players', async (req, res) => {
     Player.find({ user: req.params.userId })
       .populate('playerClass')
       .then((data) => res.send(data));
   });
 
-  // TODO: complete login functionality
   app.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
