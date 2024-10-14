@@ -6,6 +6,7 @@ import {
   playerClasses,
 } from '../interfaces/Player.interface';
 import styles from './SelectPlayer.module.css';
+import { useAuthContext } from '../lib/AuthContext';
 
 const images = require.context(
   '../assets/class-symbols',
@@ -21,15 +22,18 @@ const SelectPlayer: React.FC<{
   returnToRooms: () => void;
 }> = ({ setPlayer, returnToChat, returnToRooms }) => {
   const [players, setPlayers] = useState<Player[]>([]);
+  const { user } = useAuthContext();
 
   useEffect(() => {
-    fetch(`${serverURL}/players`)
-      .then((res) => res.json())
-      .then((res) => setPlayers(res))
-      .catch((error) => {
-        console.log(error);
-      });
-  }, []);
+    if (user) {
+      fetch(`${serverURL}/users/${user.id}/players`)
+        .then((res) => res.json())
+        .then((res) => setPlayers(res))
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+  }, [user]);
 
   const handleSelectPlayer = (e: Player) => {
     setPlayer(e);

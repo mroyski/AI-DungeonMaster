@@ -201,8 +201,8 @@ connectInMemory().then(() => {
   app.use(express.json());
 
   // TODO: find actual players for user
-  app.get('/players', async (req, res) => {
-    Player.find()
+  app.get('/users/:userId/players', async (req, res) => {
+    Player.find({ user: req.params.userId })
       .populate('playerClass')
       .then((data) => res.send(data));
   });
@@ -218,7 +218,9 @@ connectInMemory().then(() => {
           .status(401)
           .json({ message: 'incorrect username or password' });
 
-      return res.status(200).json({ message: 'login successful', username });
+      return res
+        .status(200)
+        .json({ message: 'login successful', username, id: user.id });
     } catch {
       return res.status(500).json({ message: 'login unsuccessful' });
     }

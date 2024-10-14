@@ -4,6 +4,12 @@ interface AuthContextType {
   loggedIn: Boolean;
   login: (username: string, password: string) => void;
   logout: () => void;
+  user: UserData | null;
+}
+
+interface UserData {
+  id: string;
+  username: string;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -12,6 +18,7 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const serverURL = process.env.REACT_APP_SERVER_URL;
 
   const [loggedIn, setLoggedIn] = useState<Boolean>(false);
+  const [user, setUser] = useState<UserData | null>(null);
 
   const login = async (username: string, password: string) => {
     const loginOptions = {
@@ -23,10 +30,15 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     };
 
     const response = await fetch(`${serverURL}/login`, loginOptions);
-    if (response.ok) setLoggedIn(true);
+    if (response.ok) {
+      const { id, username } = await response.json();
+      setUser({ id, username });
+      setLoggedIn(true);
+    }
   };
 
   const logout = () => {
+    setUser(null);
     setLoggedIn(false);
   };
 
@@ -36,6 +48,7 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         loggedIn,
         login,
         logout,
+        user,
       }}
     >
       {children}
