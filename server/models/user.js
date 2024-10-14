@@ -10,6 +10,10 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+userSchema.methods.passwordMatch = function (inputPassword) {
+  return inputPassword === this.password;
+};
+
 const User = mongoose.model('User', userSchema);
 
 module.exports = User;

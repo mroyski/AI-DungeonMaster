@@ -2,28 +2,28 @@ import React, { useState } from 'react';
 import { useAuthContext } from '../lib/AuthContext';
 
 const Login: React.FC = () => {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const { login } = useAuthContext();
 
   const submitHandler = (e: React.FormEvent) => {
     e.preventDefault();
-    let emailInput = email.trim();
+    let usernameInput = username.trim();
     let passwordInput = password.trim();
 
-    if (!emailInput.length || !passwordInput.length) return;
+    if (!usernameInput.length || !passwordInput.length) return;
 
-    login(emailInput, passwordInput);
+    login(usernameInput, passwordInput);
   };
 
   return (
     <form>
       <input
         type="text"
-        name="email"
-        placeholder="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
+        name="username"
+        placeholder="username"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
         required
       />
       <input

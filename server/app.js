@@ -8,6 +8,7 @@ const { connectInMemory } = require('./db/seed');
 const Room = require('./models/room');
 const Message = require('./models/message');
 const Player = require('./models/player');
+const User = require('./models/user');
 const cors = require('cors');
 
 const PORT = process.env.PORT || 8080;
@@ -206,11 +207,21 @@ connectInMemory().then(() => {
       .then((data) => res.send(data));
   });
 
-  // TODO: implement login functionality
+  // TODO: complete login functionality
   app.post('/login', async (req, res) => {
-    const { email, password } = req.body;
+    const { username, password } = req.body;
 
-    return res.status(200).json({ message: 'login successful', email });
+    try {
+      const user = await User.findOne({ username });
+      if (!user || !user.passwordMatch(password))
+        return res
+          .status(401)
+          .json({ message: 'incorrect username or password' });
+
+      return res.status(200).json({ message: 'login successful', username });
+    } catch {
+      return res.status(500).json({ message: 'login unsuccessful' });
+    }
   });
 
   server.listen(PORT, () =>

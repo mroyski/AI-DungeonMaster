@@ -17,8 +17,8 @@ const serverURL = process.env.REACT_APP_SERVER_URL;
 
 const SelectPlayer: React.FC<{
   setPlayer: Dispatch<SetStateAction<Player | null>>;
-  returnToChat: any;
-  returnToRooms: any;
+  returnToChat: () => void;
+  returnToRooms: () => void;
 }> = ({ setPlayer, returnToChat, returnToRooms }) => {
   const [players, setPlayers] = useState<Player[]>([]);
 

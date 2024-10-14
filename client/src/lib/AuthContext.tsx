@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 interface AuthContextType {
   loggedIn: Boolean;
-  login: (email: string, password: string) => void;
+  login: (username: string, password: string) => void;
   logout: () => void;
 }
 
@@ -13,13 +13,13 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
   const [loggedIn, setLoggedIn] = useState<Boolean>(false);
 
-  const login = async (email: string, password: string) => {
+  const login = async (username: string, password: string) => {
     const loginOptions = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ username, password }),
     };
 
     const response = await fetch(`${serverURL}/login`, loginOptions);
