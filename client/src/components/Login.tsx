@@ -4,7 +4,7 @@ import { useAuthContext } from '../lib/AuthContext';
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { setLoggedIn } = useAuthContext();
+  const { login } = useAuthContext();
 
   const submitHandler = (e: React.FormEvent) => {
     e.preventDefault();
@@ -13,17 +13,8 @@ const Login: React.FC = () => {
 
     if (!emailInput.length || !passwordInput.length) return;
 
-    setLoggedIn(true);
-
-    // loginHandler({ emailInput, passwordInput });
-    // returnToPlayerSelect();
-    // clearForm();
+    login(emailInput, passwordInput);
   };
-
-  //   const clearForm = () => {
-  //     setEmail('');
-  //     setPassword('');
-  //   };
 
   return (
     <form>

@@ -7,9 +7,15 @@ interface Props {
   messages: Array<Message>;
   sendMessage: (e: React.FormEvent<HTMLFormElement>, text: string) => void;
   player: Player | null;
+  roomSelected: Boolean;
 }
 
-const Chat: React.FC<Props> = ({ messages, sendMessage, player }) => {
+const Chat: React.FC<Props> = ({
+  messages,
+  sendMessage,
+  player,
+  roomSelected,
+}) => {
   const [inputMessage, setInputMessage] = useState<string>('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -30,6 +36,7 @@ const Chat: React.FC<Props> = ({ messages, sendMessage, player }) => {
   };
 
   if (!player) return <p className={styles.error}>Please select a player!</p>;
+  if (!roomSelected) return <p className={styles.error}>Please select a room!</p>;
 
   return (
     <div className={styles.chatContainer}>

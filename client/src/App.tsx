@@ -29,7 +29,7 @@ interface CustomSocket extends Socket {
 const App: React.FC = () => {
   const { player, setPlayer, players, setPlayers, messages, setMessages } =
     usePlayerContext();
-  const { loggedIn } = useAuthContext();
+  const { loggedIn, logout } = useAuthContext();
 
   const [socket, setSocket] = useState<CustomSocket | null>(null);
   const [activeComponent, setActiveComponent] = useState(PLAYER_SELECT);
@@ -125,7 +125,12 @@ const App: React.FC = () => {
         );
       case CHAT:
         return (
-          <Chat messages={messages} sendMessage={sendMessage} player={player} />
+          <Chat
+            messages={messages}
+            sendMessage={sendMessage}
+            player={player}
+            roomSelected={!!room}
+          />
         );
       case PLAYERS:
         return <Players players={players} />;
@@ -166,6 +171,7 @@ const App: React.FC = () => {
           Select
         </button>
         <button onClick={() => setActiveComponent(ROOMS)}>Rooms</button>
+        <button onClick={logout}>Log Out</button>
       </nav>
       {renderComponent()}
     </>

@@ -197,11 +197,20 @@ connectInMemory().then(() => {
   });
 
   app.use(cors());
+  app.use(express.json());
 
+  // TODO: find actual players for user
   app.get('/players', async (req, res) => {
     Player.find()
       .populate('playerClass')
       .then((data) => res.send(data));
+  });
+
+  // TODO: implement login functionality
+  app.post('/login', async (req, res) => {
+    const { email, password } = req.body;
+
+    return res.status(200).json({ message: 'login successful', email });
   });
 
   server.listen(PORT, () =>
