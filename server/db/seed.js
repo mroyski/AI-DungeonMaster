@@ -30,19 +30,33 @@ const seed = async () => {
   });
   await barbarianClass.save();
 
-  const user = new User({
-    username: 'tester',
+  const user1 = new User({
+    username: 't1',
     email: 'test@test.com',
     password: 'a',
   });
-  await user.save();
+  await user1.save();
 
-  const player = new Player({
+  const user2 = new User({
+    username: 't2',
+    email: 'test@test.com',
+    password: 'a',
+  });
+  await user2.save();
+
+  const player1 = new Player({
     name: 'Salithe',
-    user: user,
+    user: user1,
     playerClass: barbarianClass,
   });
-  await player.save();
+  await player1.save();
+
+  const player2 = new Player({
+    name: 'Aragorn',
+    user: user2,
+    playerClass: barbarianClass,
+  });
+  await player2.save();
 
   await new Room({ name: 'Crusader Strike' }).save();
   await new Room({ name: 'Kel Thuzad' }).save();

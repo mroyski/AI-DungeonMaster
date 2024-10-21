@@ -23,26 +23,38 @@ const io = require('socket.io')(server, {
 });
 
 const openai = new OpenAI();
-const interactionHistory = [];
 
-const messageAgent = async (message) => {
+const messageAgent = async (message, room) => {
   try {
-    interactionHistory.push({ role: 'system', content: message });
+    const interactionHistory = await Message.find({
+      room,
+      $or: [{ fromDungeonMaster: true }, { toDungeonMaster: true }],
+    })
+      .sort({ createdAt: 1 })
+      .lean();
+
+    console.log('INTERACTION HISTORY:', interactionHistory);
+
+    const formattedHistory = interactionHistory.map((m) => ({
+      role: m.fromDungeonMaster ? 'assistant' : 'system',
+      content: m.text,
+    }));
+
+    console.log('FORMATTED HISTORY:', formattedHistory);
+
     const completion = await openai.chat.completions.create({
-      messages: interactionHistory,
+      messages: formattedHistory,
       model: 'gpt-4o-mini',
     });
 
     const assistantMessage = completion.choices[0].message.content;
-    interactionHistory.push({ role: 'assistant', content: assistantMessage });
-    console.log('INTERACTION HISTORY *****', interactionHistory);
-    return { message: assistantMessage, sender: 'DM' };
+    return assistantMessage;
   } catch (error) {
     console.log(error);
   }
 };
 
-const startGame = async () => {
+const startGame = async (room) => {
   const initialMessage = `Act as though we are playing a Game of Dungeons and Dragons 5th edition. Act as though you are the dungeon master and I am the player. We will be creating a narrative together, where I make decisions for my character, and you make decisions for all other characters (NPCs) and creatures in the world.
 
 Your responsibilities as dungeon master are to describe the setting, environment, Non-player characters (NPCs) and their actions, as well as explain the consequences of my actions on all of the above. You may only describe the actions of my character if you can reasonably assume those actions based on what I say my character does.
@@ -63,14 +75,16 @@ If a creature decides to attack my character, you may generate an attack roll fo
 
 Before we begin playing, I would like you to provide my three adventure options. Each should be a short description of the kind of adventure we will play, and what the tone of the adventure will be. Once I decide on the adventure, you may provide a brief setting description and begin the game. I would also like an opportunity to provide the details of my character for your reference, specifically my class, race, AC, and HP.`;
 
-  return await messageAgent(initialMessage);
-};
+  await new Message({
+    text: initialMessage,
+    player: null,
+    room: room,
+    toDungeonMaster: true,
+    isManual: true,
+  }).save();
 
-// const chatHistory = {
-//   1: [],
-//   2: [],
-//   3: [],
-// };
+  return await messageAgent(initialMessage, room);
+};
 
 const sessions = [];
 
@@ -129,23 +143,34 @@ connectInMemory().then(() => {
     });
 
     socket.on('chat message', async ({ text, player, room }) => {
-      // need to seed players/users and fetch them in frontend to be able to save them here
-      await new Message({ text, player, room }).save();
+      const message = await new Message({ text, player, room }).save();
       io.to(room).emit('chat message', { text, player, room });
 
-      if (text.substring(0, 3).toLowerCase() !== '/dm') return;
+      const chatRoom = await Room.findById(room);
 
-      // if (interactionHistory.length === 0) {
-      //   startGame().then((response) => {
-      //     io.to(room).emit('chat message', response);
-      //     chatHistory[room].push({ sender: 'DM', message: response });
-      //   });
-      // } else {
-      //   messageAgent(message).then((response) => {
-      //     io.to(room).emit('chat message', response);
-      //     chatHistory[room].push({ sender: 'DM', message: response });
-      //   });
-      // }
+      if (message.toDungeonMaster) {
+        let dmText;
+
+        if (chatRoom.inProgress) {
+          dmText = await messageAgent(text, room);
+        } else {
+          dmText = await startGame(room);
+          chatRoom.inProgress = true;
+          await chatRoom.save();
+        }
+
+        const dmMessage = new Message({
+          text: dmText,
+          player: null,
+          room,
+          fromDungeonMaster: true,
+        });
+
+        await dmMessage.save();
+
+        // TODO: handle how to set player in chat as the dm using the data passed here for player
+        io.to(room).emit('chat message', { text: dmText, player: 'DM', room });
+      }
     });
 
     socket.on('join room', async ({ room, player }) => {
