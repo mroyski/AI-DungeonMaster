@@ -80,6 +80,7 @@ Before we begin playing, I would like you to provide my three adventure options.
     player: null,
     room: room,
     toDungeonMaster: true,
+    startMessage: true,
     isManual: true,
   }).save();
 
@@ -190,7 +191,7 @@ connectInMemory().then(() => {
 
       await roomToJoin.save();
 
-      const chatHistory = await Message.find({ room: room }).populate('player');
+      const chatHistory = await Message.find({ room: room, startMessage: false }).populate('player');
 
       socket.emit('chat history', { chatHistory }, socket.id);
     });

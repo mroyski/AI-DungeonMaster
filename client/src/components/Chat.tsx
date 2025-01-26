@@ -36,7 +36,8 @@ const Chat: React.FC<Props> = ({
   };
 
   if (!player) return <p className={styles.error}>Please select a player!</p>;
-  if (!roomSelected) return <p className={styles.error}>Please select a room!</p>;
+  if (!roomSelected)
+    return <p className={styles.error}>Please select a room!</p>;
 
   return (
     <div className={styles.chatContainer}>
@@ -45,16 +46,19 @@ const Chat: React.FC<Props> = ({
       </div>
       <div className={styles.messagesContainer}>
         <ul className={styles.messages}>
-          {messages.map((msg, index) => (
-            <li
-              key={index}
-              className={
-                index % 2 === 0 ? styles.messageOdd : styles.messageEven
-              }
-            >
-              {msg.player.name}: {msg.text}
-            </li>
-          ))}
+          {messages.map((msg, index) => {
+            const messageFrom = msg.fromDungeonMaster ? 'DM' : player.name;
+            return (
+              <li
+                key={index}
+                className={
+                  index % 2 === 0 ? styles.messageOdd : styles.messageEven
+                }
+              >
+                {messageFrom}: {msg.text}
+              </li>
+            );
+          })}
           <div ref={messagesEndRef} />
         </ul>
       </div>

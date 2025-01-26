@@ -4,4 +4,7 @@ export interface Message {
   text: string;
   player: Player;
   room: string;
+  toDungeonMaster: boolean,
+  fromDungeonMaster: boolean,
+  startMessage: boolean
 }

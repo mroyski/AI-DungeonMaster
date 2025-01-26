@@ -11,6 +11,7 @@ import PlayersOnline from './components/PlayersOnline';
 import Rooms from './components/Rooms';
 import Login from './components/Login';
 import { useAuthContext } from './lib/AuthContext';
+import { Message } from './interfaces/Message.interface';
 
 const SERVER_URL = process.env.REACT_APP_SERVER_URL || 'http://localhost:8080';
 
@@ -61,7 +62,7 @@ const App: React.FC = () => {
 
       socket.on(
         'chat message',
-        (data: { text: string; player: Player; room: string }) => {
+        (data: Message) => {
           console.log('DATA:', data);
           console.log('TEXT', data.text);
           setMessages((prevMessages) => [...prevMessages, data]);
