@@ -42,21 +42,21 @@ const SelectPlayer: React.FC<{
 
   return (
     <div className={styles.selectPlayer}>
-      {players.map((c) => (
-        <div key={c.name} className={styles.playerOption}>
+      {players.map((p) => (
+        <div key={p.name} className={styles.playerOption}>
           <img
             className={styles.symbol}
-            src={images(`./${c.playerClass.symbol}`)}
-            alt={c.name}
+            src={images(`./${p.playerClass.symbol}`)}
+            alt={p.name}
           />
           <button
             className={styles.playerButton}
-            onClick={() => handleSelectPlayer(c)}
+            onClick={() => handleSelectPlayer(p)}
           >
-            {c.name}
+            {p.name}
           </button>
           <p className={styles.playerDescription}>
-            {c.playerClass.name}: {c.playerClass.description}
+            {p.playerClass.name}: {p.playerClass.description}
           </p>
           <hr className={styles.hr} />
         </div>
