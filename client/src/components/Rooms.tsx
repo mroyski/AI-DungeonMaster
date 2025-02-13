@@ -26,7 +26,7 @@ const Rooms: React.FC<{
 
   if (!player) return <p>Select Player</p>;
 
-  if (!allRooms) return <p>No available Rooms</p>;
+  if (!allRooms.length) return <p>No available Rooms</p>;
 
   return (
     <div>

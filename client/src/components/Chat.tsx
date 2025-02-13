@@ -47,7 +47,7 @@ const Chat: React.FC<Props> = ({
       <div className={styles.messagesContainer}>
         <ul className={styles.messages}>
           {messages.map((msg, index) => {
-            const messageFrom = msg.fromDungeonMaster ? 'DM' : player.name;
+            const messageFrom = msg.fromDungeonMaster ? 'DM' : msg.player.name;
             return (
               <li
                 key={index}
