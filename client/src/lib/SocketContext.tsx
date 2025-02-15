@@ -30,7 +30,9 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
   const [room, setRoom] = useState();
 
   useEffect(() => {
-    if (player && loggedIn) {
+    if (!player || !loggedIn) {
+      socket?.disconnect();
+    } else if (player && loggedIn) {
       const socket: CustomSocket = io(SERVER_URL, {
         withCredentials: true,
         auth: {

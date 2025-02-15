@@ -229,7 +229,9 @@ connectInMemory().then(() => {
   app.get('/users/:userId/players', async (req, res) => {
     Player.find({ user: req.params.userId })
       .populate('playerClass')
-      .then((data) => res.send(data));
+      .then((data) => {
+        console.log('data:', data);
+        res.send(data)});
   });
 
   app.post('/login', async (req, res) => {
@@ -237,6 +239,7 @@ connectInMemory().then(() => {
 
     try {
       const user = await User.findOne({ username });
+      console.log('user:', user);
       if (!user || !user.passwordMatch(password))
         return res
           .status(401)

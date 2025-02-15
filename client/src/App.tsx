@@ -43,6 +43,11 @@ const App: React.FC = () => {
     setActiveComponent(ROOMS);
   };
 
+  const logoutHandler = () => {
+    setActiveComponent(PLAYER_SELECT);
+    logout();
+  }
+
   const renderComponent = () => {
     if (!loggedIn) return <Login />;
 
@@ -107,7 +112,7 @@ const App: React.FC = () => {
           Select
         </button>
         <button onClick={() => setActiveComponent(ROOMS)}>Rooms</button>
-        <button onClick={logout}>Log Out</button>
+        <button onClick={logoutHandler}>Log Out</button>
       </nav>
       {renderComponent()}
     </>

@@ -22,18 +22,20 @@ const SelectPlayer: React.FC<{
   returnToRooms: () => void;
 }> = ({ setPlayer, returnToChat, returnToRooms }) => {
   const [players, setPlayers] = useState<Player[]>([]);
-  const { user } = useAuthContext();
+  const { user, loggedIn } = useAuthContext();
 
   useEffect(() => {
-    if (user) {
+    if (user && loggedIn) {
       fetch(`${serverURL}/users/${user.id}/players`)
         .then((res) => res.json())
         .then((res) => setPlayers(res))
         .catch((error) => {
           console.log(error);
         });
+    } else {
+      setPlayers([]);
     }
-  }, [user]);
+  }, [user, loggedIn]);
 
   const handleSelectPlayer = (e: Player) => {
     setPlayer(e);

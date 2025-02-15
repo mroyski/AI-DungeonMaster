@@ -5,10 +5,12 @@ import React, {
   ReactNode,
   Dispatch,
   SetStateAction,
+  useEffect,
 } from 'react';
 
 import { Player } from '../interfaces/Player.interface';
 import { Message } from '../interfaces/Message.interface';
+import { useAuthContext } from './AuthContext';
 
 interface PlayerContextType {
   player: Player | null;
@@ -25,6 +27,15 @@ const PlayerProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [player, setPlayer] = useState<Player | null>(null);
   const [players, setPlayers] = useState<Player[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
+  const { user, loggedIn } = useAuthContext();
+
+  useEffect(() => {
+    if (!user || !loggedIn) {
+      setPlayer(null);
+      setPlayers([]);
+      setMessages([]);
+    }
+  }, [user, loggedIn]);
 
   return (
     <PlayerContext.Provider
