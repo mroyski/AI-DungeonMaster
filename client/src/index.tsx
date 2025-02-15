@@ -5,6 +5,7 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { PlayerProvider } from './lib/PlayerContext';
 import { AuthProvider } from './lib/AuthContext';
+import { SocketProvider } from './lib/SocketContext';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -13,7 +14,9 @@ root.render(
   <React.StrictMode>
     <AuthProvider>
       <PlayerProvider>
-        <App />
+        <SocketProvider>
+          <App />
+        </SocketProvider>
       </PlayerProvider>
     </AuthProvider>
   </React.StrictMode>
