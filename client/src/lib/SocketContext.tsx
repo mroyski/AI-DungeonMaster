@@ -16,6 +16,7 @@ interface SocketContextType {
   allRooms: any[];
   setRoom: React.Dispatch<React.SetStateAction<any>>;
   room: any;
+  sendMessage: (e: React.FormEvent<HTMLFormElement>, text: string) => void;
 }
 
 const SocketContext = createContext<SocketContextType | null>(null);
@@ -28,6 +29,13 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
   const [socket, setSocket] = useState<CustomSocket | null>(null);
   const [allRooms, setAllRooms] = useState([]);
   const [room, setRoom] = useState();
+
+  const sendMessage = (e: React.FormEvent<HTMLFormElement>, text: string) => {
+    e.preventDefault();
+    if (text.trim() !== '' && socket && player) {
+      socket.emit('chat message', { text, player: player, room: room });
+    }
+  };
 
   useEffect(() => {
     if (!player || !loggedIn) {
@@ -84,7 +92,9 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [player, setMessages, setPlayers, loggedIn]);
 
   return (
-    <SocketContext.Provider value={{ socket, allRooms, setRoom, room }}>
+    <SocketContext.Provider
+      value={{ socket, allRooms, setRoom, room, sendMessage }}
+    >
       {children}
     </SocketContext.Provider>
   );

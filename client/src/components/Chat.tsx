@@ -2,20 +2,21 @@ import React, { useState, useEffect, useRef } from 'react';
 import styles from './Chat.module.css';
 import { Player } from '../interfaces/Player.interface';
 import { Message } from '../interfaces/Message.interface';
+import { useSocketContext } from '../lib/SocketContext';
 
 interface Props {
   messages: Array<Message>;
-  sendMessage: (e: React.FormEvent<HTMLFormElement>, text: string) => void;
   player: Player | null;
   roomSelected: Boolean;
 }
 
+
 const Chat: React.FC<Props> = ({
   messages,
-  sendMessage,
   player,
   roomSelected,
 }) => {
+  const { sendMessage } = useSocketContext();
   const [inputMessage, setInputMessage] = useState<string>('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 

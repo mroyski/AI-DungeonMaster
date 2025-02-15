@@ -11,7 +11,6 @@ import Login from './components/Login';
 import { useAuthContext } from './lib/AuthContext';
 import { useSocketContext } from './lib/SocketContext';
 
-
 const LOGIN = 'login';
 const PLAYERS = 'players';
 const PLAYER_SELECT = 'playerselect';
@@ -20,19 +19,12 @@ const CHAT = 'chat';
 const ROOMS = 'rooms';
 
 const App: React.FC = () => {
-  const { player, setPlayer, players, setPlayers, messages, setMessages } =
+  const { player, setPlayer, players, messages, setMessages } =
     usePlayerContext();
   const { loggedIn, logout } = useAuthContext();
 
   const { socket, allRooms, setRoom, room } = useSocketContext();
   const [activeComponent, setActiveComponent] = useState(PLAYER_SELECT);
-
-  const sendMessage = (e: React.FormEvent<HTMLFormElement>, text: string) => {
-    e.preventDefault();
-    if (text.trim() !== '' && socket && player) {
-      socket.emit('chat message', { text, player: player, room: room });
-    }
-  };
 
   const returnToChat = () => {
     setMessages([]);
@@ -46,7 +38,7 @@ const App: React.FC = () => {
   const logoutHandler = () => {
     setActiveComponent(PLAYER_SELECT);
     logout();
-  }
+  };
 
   const renderComponent = () => {
     if (!loggedIn) return <Login />;
@@ -66,12 +58,7 @@ const App: React.FC = () => {
         );
       case CHAT:
         return (
-          <Chat
-            messages={messages}
-            sendMessage={sendMessage}
-            player={player}
-            roomSelected={!!room}
-          />
+          <Chat messages={messages} player={player} roomSelected={!!room} />
         );
       case PLAYERS:
         return <Players players={players} />;
