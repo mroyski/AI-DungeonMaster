@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Chat from './components/Chat';
 import { usePlayerContext } from './lib/PlayerContext';
 import SelectPlayer from './components/SelectPlayer';
@@ -10,77 +10,38 @@ import Rooms from './components/Rooms';
 import Login from './components/Login';
 import { useAuthContext } from './lib/AuthContext';
 import { useSocketContext } from './lib/SocketContext';
-
-const LOGIN = 'login';
-const PLAYERS = 'players';
-const PLAYER_SELECT = 'playerselect';
-const PLAYER_DETAILS = 'playerdetails';
-const CHAT = 'chat';
-const ROOMS = 'rooms';
+import { useRenderComponent } from './lib/RenderComponentContext';
+import { RenderComponentName } from './constants';
 
 const App: React.FC = () => {
-  const { player, setPlayer, players, messages, setMessages } =
-    usePlayerContext();
-  const { loggedIn, logout } = useAuthContext();
-
-  const { socket, allRooms, setRoom, room } = useSocketContext();
-  const [activeComponent, setActiveComponent] = useState(PLAYER_SELECT);
-
-  const returnToChat = () => {
-    setMessages([]);
-    setActiveComponent(CHAT);
-  };
-
-  const returnToRooms = () => {
-    setActiveComponent(ROOMS);
-  };
+  const { player, players, messages } = usePlayerContext();
+  const { logout } = useAuthContext();
+  const { room } = useSocketContext();
+  const { activeComponent, setActiveComponent } = useRenderComponent();
 
   const logoutHandler = () => {
-    setActiveComponent(PLAYER_SELECT);
+    setActiveComponent(RenderComponentName.PLAYER_SELECT);
     logout();
   };
 
   const renderComponent = () => {
-    if (!loggedIn) return <Login />;
-
     switch (activeComponent) {
-      case LOGIN:
+      case RenderComponentName.LOGIN:
         return <Login />;
-      case PLAYER_DETAILS:
+      case RenderComponentName.PLAYER_DETAILS:
         return <PlayerDetails player={player} />;
-      case PLAYER_SELECT:
-        return (
-          <SelectPlayer
-            setPlayer={setPlayer}
-            returnToChat={returnToChat}
-            returnToRooms={returnToRooms}
-          />
-        );
-      case CHAT:
+      case RenderComponentName.PLAYER_SELECT:
+        return <SelectPlayer />;
+      case RenderComponentName.CHAT:
         return (
           <Chat messages={messages} player={player} roomSelected={!!room} />
         );
-      case PLAYERS:
+      case RenderComponentName.PLAYERS:
         return <Players players={players} />;
-      case ROOMS:
-        return (
-          <Rooms
-            socket={socket}
-            player={player}
-            setRoom={setRoom}
-            currentRoom={room}
-            allRooms={allRooms}
-            returnToChat={returnToChat}
-          />
-        );
+      case RenderComponentName.ROOMS:
+        return <Rooms />;
       default:
-        return (
-          <SelectPlayer
-            setPlayer={setPlayer}
-            returnToChat={returnToChat}
-            returnToRooms={returnToRooms}
-          />
-        );
+        return <SelectPlayer />;
     }
   };
 
@@ -88,17 +49,25 @@ const App: React.FC = () => {
     <>
       <nav className={styles.navbar}>
         <p>RPG</p>
-        <button onClick={() => setActiveComponent(PLAYERS)}>
+        <button onClick={() => setActiveComponent(RenderComponentName.PLAYERS)}>
           <PlayersOnline players={players} />
         </button>
-        <button onClick={() => setActiveComponent(CHAT)}>Chat</button>
-        <button onClick={() => setActiveComponent(PLAYER_DETAILS)}>
+        <button onClick={() => setActiveComponent(RenderComponentName.CHAT)}>
+          Chat
+        </button>
+        <button
+          onClick={() => setActiveComponent(RenderComponentName.PLAYER_DETAILS)}
+        >
           Player
         </button>
-        <button onClick={() => setActiveComponent(PLAYER_SELECT)}>
+        <button
+          onClick={() => setActiveComponent(RenderComponentName.PLAYER_SELECT)}
+        >
           Select
         </button>
-        <button onClick={() => setActiveComponent(ROOMS)}>Rooms</button>
+        <button onClick={() => setActiveComponent(RenderComponentName.ROOMS)}>
+          Rooms
+        </button>
         <button onClick={logoutHandler}>Log Out</button>
       </nav>
       {renderComponent()}

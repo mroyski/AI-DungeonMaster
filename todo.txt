@@ -1,4 +1,5 @@
 Client
+- Make rendered room a hook
 - Add ability to create a custom character
 - Add friends list and display friends who are connected via web socket
 - Tell the DM information about the character who started the game so they don't have to do it manually

@@ -3,8 +3,9 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { PlayerProvider } from './lib/PlayerContext';
 import { AuthProvider } from './lib/AuthContext';
+import { RenderComponentProvider } from './lib/RenderComponentContext';
+import { PlayerProvider } from './lib/PlayerContext';
 import { SocketProvider } from './lib/SocketContext';
 
 const root = ReactDOM.createRoot(
@@ -15,7 +16,9 @@ root.render(
     <AuthProvider>
       <PlayerProvider>
         <SocketProvider>
-          <App />
+          <RenderComponentProvider>
+            <App />
+          </RenderComponentProvider>
         </SocketProvider>
       </PlayerProvider>
     </AuthProvider>

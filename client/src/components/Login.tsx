@@ -1,10 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuthContext } from '../lib/AuthContext';
+import { useRenderComponent } from '../lib/RenderComponentContext';
+import { RenderComponentName } from '../constants';
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const { login } = useAuthContext();
+  const { login, loggedIn } = useAuthContext();
+  const { setActiveComponent } = useRenderComponent();
+
+  useEffect(() => {
+    if (loggedIn) {
+      setActiveComponent(RenderComponentName.PLAYER_SELECT);
+    }
+  }, [loggedIn, setActiveComponent]);
 
   const submitHandler = (e: React.FormEvent) => {
     e.preventDefault();
@@ -15,6 +24,8 @@ const Login: React.FC = () => {
 
     login(usernameInput, passwordInput);
   };
+
+  if (loggedIn) return null;
 
   return (
     <form>

@@ -1,27 +1,23 @@
-interface Room {
-  id: string;
-  name: string;
-}
+import { usePlayerContext } from '../lib/PlayerContext';
+import { useSocketContext } from '../lib/SocketContext';
+import { useRenderComponent } from '../lib/RenderComponentContext';
+import { RenderComponentName } from '../constants';
 
-const Rooms: React.FC<{
-  socket: any;
-  player: any;
-  currentRoom: any;
-  setRoom: any;
-  allRooms: Room[];
-  returnToChat: any;
-}> = ({ socket, player, currentRoom, setRoom, allRooms, returnToChat }) => {
+const Rooms: React.FC = () => {
+  const { setActiveComponent } = useRenderComponent();
+  const { socket, setRoom, allRooms } = useSocketContext();
+  const { player, setMessages } = usePlayerContext();
+
   const joinRoom = (room: string) => {
-    if (currentRoom)
-      socket.emit('leave room', { room: currentRoom, name: player.name });
+    if (room) socket?.emit('leave room', { room, name: player?.name });
 
-    socket.emit('join room', {
+    socket?.emit('join room', {
       room,
       player: player,
-      userID: player.userID,
     });
+    setMessages([]);
     setRoom(room);
-    returnToChat();
+    setActiveComponent(RenderComponentName.CHAT);
   };
 
   if (!player) return <p>Select Player</p>;
@@ -31,13 +27,13 @@ const Rooms: React.FC<{
   return (
     <div>
       {allRooms.map((r) => (
-        <>
+        <div key={r.id}>
           <div>{r.name}</div>
           <button key={r.id} onClick={() => joinRoom(r.id)}>
             Join Room {r.id}
           </button>
           <hr />
-        </>
+        </div>
       ))}
     </div>
   );

@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Dispatch, SetStateAction } from 'react';
-import {
-  Player,
-  PlayerClass,
-  playerClasses,
-} from '../interfaces/Player.interface';
+import { Player } from '../interfaces/Player.interface';
 import styles from './SelectPlayer.module.css';
 import { useAuthContext } from '../lib/AuthContext';
+import { usePlayerContext } from '../lib/PlayerContext';
+import { useRenderComponent } from '../lib/RenderComponentContext';
+import { RenderComponentName } from '../constants';
 
 const images = require.context(
   '../assets/class-symbols',
@@ -16,13 +14,11 @@ const images = require.context(
 
 const serverURL = process.env.REACT_APP_SERVER_URL;
 
-const SelectPlayer: React.FC<{
-  setPlayer: Dispatch<SetStateAction<Player | null>>;
-  returnToChat: () => void;
-  returnToRooms: () => void;
-}> = ({ setPlayer, returnToChat, returnToRooms }) => {
+const SelectPlayer: React.FC = () => {
   const [players, setPlayers] = useState<Player[]>([]);
   const { user, loggedIn } = useAuthContext();
+  const { setPlayer } = usePlayerContext();
+  const { setActiveComponent } = useRenderComponent();
 
   useEffect(() => {
     if (user && loggedIn) {
@@ -38,8 +34,9 @@ const SelectPlayer: React.FC<{
   }, [user, loggedIn]);
 
   const handleSelectPlayer = (e: Player) => {
+    console.log(e);
     setPlayer(e);
-    returnToRooms();
+    setActiveComponent(RenderComponentName.ROOMS);
   };
 
   return (
