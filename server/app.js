@@ -33,14 +33,10 @@ const messageAgent = async (message, room) => {
       .sort({ createdAt: 1 })
       .lean();
 
-    console.log('INTERACTION HISTORY:', interactionHistory);
-
     const formattedHistory = interactionHistory.map((m) => ({
       role: m.fromDungeonMaster ? 'assistant' : 'system',
       content: m.text,
     }));
-
-    console.log('FORMATTED HISTORY:', formattedHistory);
 
     const completion = await openai.chat.completions.create({
       messages: formattedHistory,
@@ -144,8 +140,10 @@ connectInMemory().then(() => {
     });
 
     socket.on('chat message', async ({ text, player, room }) => {
-      const message = await new Message({ text, player, room }).save();
-      io.to(room).emit('chat message', { text, player, room });
+      let message = await new Message({ text, player, room }).save();
+      message = await Message.findById(message._id).populate('player');
+
+      io.to(room).emit('chat message', message);
 
       const chatRoom = await Room.findById(room);
 
@@ -170,7 +168,7 @@ connectInMemory().then(() => {
         await dmMessage.save();
 
         // TODO: handle how to set player in chat as the dm using the data passed here for player
-        io.to(room).emit('chat message', { text: dmText, player: 'DM', room });
+        io.to(room).emit('chat message', dmMessage);
       }
     });
 
@@ -183,7 +181,6 @@ connectInMemory().then(() => {
         _id: room,
         players: player,
       });
-      console.log('playerInRoom?:', playerInRoom);
 
       if (!playerInRoom) {
         roomToJoin.players.push(player);
@@ -191,7 +188,10 @@ connectInMemory().then(() => {
 
       await roomToJoin.save();
 
-      const chatHistory = await Message.find({ room: room, startMessage: false }).populate('player');
+      const chatHistory = await Message.find({
+        room: room,
+        startMessage: false,
+      }).populate('player');
 
       socket.emit('chat history', { chatHistory }, socket.id);
     });
@@ -230,8 +230,8 @@ connectInMemory().then(() => {
     Player.find({ user: req.params.userId })
       .populate('playerClass')
       .then((data) => {
-        console.log('data:', data);
-        res.send(data)});
+        res.send(data);
+      });
   });
 
   app.post('/login', async (req, res) => {
@@ -239,7 +239,6 @@ connectInMemory().then(() => {
 
     try {
       const user = await User.findOne({ username });
-      console.log('user:', user);
       if (!user || !user.passwordMatch(password))
         return res
           .status(401)

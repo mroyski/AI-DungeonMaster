@@ -63,18 +63,14 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
       });
 
       socket.on('chat message', (data: Message) => {
-        console.log('DATA:', data);
-        console.log('TEXT', data.text);
         setMessages((prevMessages) => [...prevMessages, data]);
       });
 
       socket.on('chat history', ({ chatHistory }) => {
-        console.log('chat history', chatHistory);
         setMessages(chatHistory);
       });
 
       socket.on('players', (players: any[]) => {
-        console.log('players: ', players);
         const otherPlayers = players.filter((p) => p.id !== socket.id);
         setPlayers(otherPlayers);
       });
