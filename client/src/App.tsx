@@ -29,7 +29,7 @@ const App: React.FC = () => {
       case RenderComponentName.LOGIN:
         return <Login />;
       case RenderComponentName.PLAYER_DETAILS:
-        return <PlayerDetails player={player} />;
+        return <PlayerDetails />;
       case RenderComponentName.PLAYER_SELECT:
         return <SelectPlayer />;
       case RenderComponentName.CHAT:
@@ -59,11 +59,6 @@ const App: React.FC = () => {
           onClick={() => setActiveComponent(RenderComponentName.PLAYER_DETAILS)}
         >
           Player
-        </button>
-        <button
-          onClick={() => setActiveComponent(RenderComponentName.PLAYER_SELECT)}
-        >
-          Select
         </button>
         <button onClick={() => setActiveComponent(RenderComponentName.ROOMS)}>
           Rooms

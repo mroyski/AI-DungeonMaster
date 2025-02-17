@@ -3,7 +3,7 @@
   border: 2px solid #393e46;
   padding: 16px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-  height: calc(100vh - 110px);
+  /* height: calc(100vh - 110px); */
 }
 
 .playerName {

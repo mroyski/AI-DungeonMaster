@@ -1,10 +1,10 @@
 Client
-- Make rendered room a hook
 - Add ability to create a custom character
 - Add friends list and display friends who are connected via web socket
 - Tell the DM information about the character who started the game so they don't have to do it manually
 - Add ability for new chatters to join the game by sending a message to the DM or clicking a button
 - Add view to search available rooms to join
+- DONE: Make rendered room a hook
 
 Server
 - Save chat history

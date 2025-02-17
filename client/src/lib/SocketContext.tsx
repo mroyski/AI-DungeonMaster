@@ -6,7 +6,6 @@ import { Message } from '../interfaces/Message.interface';
 
 const SERVER_URL = process.env.REACT_APP_SERVER_URL || 'http://localhost:8080';
 
-// Extend the Socket interface
 interface CustomSocket extends Socket {
   userID?: string;
 }
