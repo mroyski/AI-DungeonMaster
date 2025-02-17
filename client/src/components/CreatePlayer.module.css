@@ -1,0 +1,51 @@
+/* CreatePlayer.module.css */
+
+/* body {
+    color: #ffffff;
+    background-color: #222831;
+  } */
+
+.createPlayerForm {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #393e46;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  width: 300px;
+  margin: auto;
+}
+
+.createPlayerLabel {
+  margin-bottom: 5px;
+  font-size: 16px;
+}
+
+.createPlayerInput,
+.createPlayerSelect {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #eeeeee;
+  border-radius: 5px;
+  background-color: #222831;
+  color: #ffffff;
+  font-size: 14px;
+}
+
+.createPlayerButton {
+  width: 100%;
+  padding: 10px;
+  background-color: #ff5252;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  border-radius: 20px;
+  font-size: 16px;
+}
+
+.create-player-button:hover {
+  background-color: #fa8072;
+}

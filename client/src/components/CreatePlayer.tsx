@@ -1,3 +1,4 @@
+import styles from './CreatePlayer.module.css';
 import { useAuthContext } from '../lib/AuthContext';
 import { playerClasses } from '../interfaces/Player.interface';
 import { useRenderComponent } from '../lib/RenderComponentContext';
@@ -35,18 +36,32 @@ const CreatePlayer: React.FC = () => {
 
   return (
     <>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="name">Name: </label>
-        <input type="text" name="name" placeholder="name" required />
-        <label htmlFor="playerClass">Class: </label>
-        <select name="playerClass" required>
+      <form onSubmit={handleSubmit} className={styles.createPlayerForm}>
+        <label htmlFor="name" className={styles.createPlayerLabel}>
+          Name:
+        </label>
+        <input
+          type="text"
+          name="name"
+          placeholder="name"
+          required
+          className={styles.createPlayerInput}
+        />
+
+        <label htmlFor="playerClass" className={styles.createPlayerLabel}>
+          Class:
+        </label>
+        <select name="playerClass" required className={styles.createPlayerSelect}>
           {playerClasses.map((p) => (
             <option key={p.name} value={p.name}>
               {p.name}
             </option>
           ))}
         </select>
-        <button type="submit">Create Player</button>
+
+        <button type="submit" className={styles.createPlayerButton}>
+          Create Player
+        </button>
       </form>
     </>
   );
