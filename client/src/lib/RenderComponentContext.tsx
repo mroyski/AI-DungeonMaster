@@ -7,6 +7,7 @@ import {
 } from 'react';
 import { RenderComponentName } from '../constants';
 import { useAuthContext } from './AuthContext';
+import { usePlayerContext } from './PlayerContext';
 
 type RenderComponentContextType = {
   activeComponent: RenderComponentName;
@@ -26,12 +27,13 @@ export const RenderComponentProvider = ({
   const [activeComponent, setActiveComponent] = useState(
     RenderComponentName.PLAYER_SELECT
   );
+  const { player } = usePlayerContext();
 
   useEffect(() => {
     if (!loggedIn) {
       setActiveComponent(RenderComponentName.LOGIN);
     }
-  }, [loggedIn, activeComponent]);
+  }, [loggedIn, player, activeComponent]);
 
   return (
     <RenderComponentContext.Provider

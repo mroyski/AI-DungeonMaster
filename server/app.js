@@ -10,6 +10,7 @@ const Message = require('./models/message');
 const Player = require('./models/player');
 const User = require('./models/user');
 const cors = require('cors');
+const PlayerClass = require('./models/playerClass');
 
 const PORT = process.env.PORT || 8080;
 const app = express();
@@ -232,6 +233,24 @@ connectInMemory().then(() => {
       .then((data) => {
         res.send(data);
       });
+  });
+
+  app.post('/users/:userId/players', async (req, res) => {
+    const { name, playerClass } = req.body;
+    const userId = req.params.userId;
+    const playerClassModel = await PlayerClass.findOne({ name: playerClass });
+
+    try {
+      const player = await new Player({
+        name,
+        user: userId,
+        playerClass: playerClassModel,
+      }).save();
+
+      res.status(201).json(player);
+    } catch (error) {
+      res.status(500).json({ message: 'Error creating player' });
+    }
   });
 
   app.post('/login', async (req, res) => {

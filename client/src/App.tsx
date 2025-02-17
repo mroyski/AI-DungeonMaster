@@ -12,6 +12,7 @@ import { useAuthContext } from './lib/AuthContext';
 import { useSocketContext } from './lib/SocketContext';
 import { useRenderComponent } from './lib/RenderComponentContext';
 import { RenderComponentName } from './constants';
+import CreatePlayer from './components/CreatePlayer';
 
 const App: React.FC = () => {
   const { player, players, messages } = usePlayerContext();
@@ -32,6 +33,8 @@ const App: React.FC = () => {
         return <PlayerDetails />;
       case RenderComponentName.PLAYER_SELECT:
         return <SelectPlayer />;
+      case RenderComponentName.PLAYER_CREATE:
+        return <CreatePlayer />;
       case RenderComponentName.CHAT:
         return (
           <Chat messages={messages} player={player} roomSelected={!!room} />

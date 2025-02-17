@@ -29,6 +29,11 @@ const PlayerDetails: React.FC = () => {
       >
         Player Select
       </button>
+      <button
+        onClick={() => setActiveComponent(RenderComponentName.PLAYER_CREATE)}
+      >
+        Player Create
+      </button>
     </>
   );
 };
