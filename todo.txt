@@ -1,21 +1,18 @@
 Client
-- Add ability to create a custom character
+- Add ability to create a custom character -> WIP
+- Add ability for new chatters to join the game by sending a message to the DM or clicking a button
+    - maybe a modal when going through join room flow which submits form to join room
+    - this should trigger a message to the DM?
 - Add friends list and display friends who are connected via web socket
 - Tell the DM information about the character who started the game so they don't have to do it manually
-- Add ability for new chatters to join the game by sending a message to the DM or clicking a button
 - Add view to search available rooms to join
-- DONE: Make rendered room a hook
 
 Server
 - Save chat history
-    - Start with in memory, then move to long term storage (MongoDB?)
+    - Start with in memory (DONE), then move to long term storage (MongoDB?)
 - Setup private rooms
-    - This rooms will be games with multiple players and player 2 player private chats
+    - These rooms will be games with multiple players and player 2 player private chats
+    - Public rooms exposed to all, private rooms exposed to friends or still public but need a password?
 - Compress chat history
     - Maybe ChatGPT could send a brief summary of the status of the game in a response to be used on subsuquent requests so the who chat history does not have to be used
     - Maybe we can save the history to the file, and update that file in the OpenAI account to use as context instead of a chat history in API requests?
-
-GENERAL
-- DONE: Add faux login to fetch default user and use that for player select
-    - this will enable development to start saving chat history - development
-- Add user context or integrate it with player context and configure it with login
