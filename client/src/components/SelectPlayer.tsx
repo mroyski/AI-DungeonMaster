@@ -5,6 +5,7 @@ import { useAuthContext } from '../lib/AuthContext';
 import { usePlayerContext } from '../lib/PlayerContext';
 import { useRenderComponent } from '../lib/RenderComponentContext';
 import { RenderComponentName } from '../constants';
+import { useSocketContext } from '../lib/SocketContext';
 
 const images = require.context(
   '../assets/class-symbols',
@@ -19,6 +20,7 @@ const SelectPlayer: React.FC = () => {
   const { user, loggedIn } = useAuthContext();
   const { setPlayer } = usePlayerContext();
   const { setActiveComponent } = useRenderComponent();
+  const { setRoom } = useSocketContext();
 
   useEffect(() => {
     if (user && loggedIn) {
@@ -34,6 +36,7 @@ const SelectPlayer: React.FC = () => {
   }, [user, loggedIn]);
 
   const handleSelectPlayer = (e: Player) => {
+    setRoom(null);
     console.log(e);
     setPlayer(e);
     setActiveComponent(RenderComponentName.ROOMS);
