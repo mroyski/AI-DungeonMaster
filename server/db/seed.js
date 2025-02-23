@@ -4,6 +4,7 @@ const Room = require('../models/room');
 const Player = require('../models/player');
 const User = require('../models/user');
 const PlayerClass = require('../models/playerClass');
+const { ABILITIES } = require('../config/constants');
 
 const connectInMemory = async () => {
   const mongoServer = await MongoMemoryServer.create();
@@ -24,8 +25,8 @@ const seed = async () => {
   const barbarianClass = new PlayerClass({
     name: 'Barbarian',
     description:
-      'A fierce warrior of primitive background who can enter a battle rag',
-    primaryAbility: 'Strength',
+      'A fierce warrior of primitive background who can enter a battle rage',
+    primaryAbility: ABILITIES.STRENGTH,
     symbol: 'Barbarian.jpg',
   });
   await barbarianClass.save();
@@ -34,7 +35,7 @@ const seed = async () => {
     name: 'Bard',
     description:
       'An inspiring magician whose power echoes the music of creation',
-    primaryAbility: 'Charisma',
+    primaryAbility: ABILITIES.CHARISMA,
     symbol: 'Bard.jpg',
   });
   await bardClass.save();
@@ -43,7 +44,7 @@ const seed = async () => {
     name: 'Cleric',
     description:
       'A priestly champion who wields divine magic in service of a higher power',
-    primaryAbility: 'Wisdom',
+    primaryAbility: ABILITIES.WISDOM,
     symbol: 'Cleric.jpg',
   });
   await clericClass.save();
@@ -52,7 +53,7 @@ const seed = async () => {
     name: 'Druid',
     description:
       'A priest of the Old Faith, wielding the powers of nature and adopting animal forms',
-    primaryAbility: 'Wisdom',
+    primaryAbility: ABILITIES.WISDOM,
     symbol: 'Druid.jpg',
   });
   await druidClass.save();
@@ -61,7 +62,7 @@ const seed = async () => {
     name: 'Fighter',
     description:
       'A master of martial combat, skilled with a variety of weapons and armor',
-    primaryAbility: 'Strength',
+    primaryAbility: ABILITIES.STRENGTH,
     symbol: 'Fighter.jpg',
   });
   await fighterClass.save();
@@ -70,7 +71,7 @@ const seed = async () => {
     name: 'Monk',
     description:
       'A master of martial arts, harnessing the power of the body in pursuit of physical and spiritual perfection',
-    primaryAbility: 'Dexterity',
+    primaryAbility: ABILITIES.DEXTERITY,
     symbol: 'Monk.jpg',
   });
   await monkClass.save();
@@ -79,7 +80,7 @@ const seed = async () => {
     name: 'Paladin',
     description:
       'A holy warrior bound to a sacred oath, fighting for justice and righteousness',
-    primaryAbility: 'Strength',
+    primaryAbility: ABILITIES.STRENGTH,
     symbol: 'Paladin.jpg',
   });
   await paladinClass.save();
@@ -88,7 +89,7 @@ const seed = async () => {
     name: 'Ranger',
     description:
       'A warrior who uses martial prowess and nature magic to combat threats on the edges of civilization',
-    primaryAbility: 'Dexterity',
+    primaryAbility: ABILITIES.DEXTERITY,
     symbol: 'Ranger.jpg',
   });
   await rangerClass.save();
@@ -97,7 +98,7 @@ const seed = async () => {
     name: 'Rogue',
     description:
       'A scoundrel who uses stealth and trickery to overcome obstacles and enemies',
-    primaryAbility: 'Dexterity',
+    primaryAbility: ABILITIES.DEXTERITY,
     symbol: 'Rogue.jpg',
   });
   await rogueClass.save();
@@ -106,7 +107,7 @@ const seed = async () => {
     name: 'Sorcerer',
     description:
       'A spellcaster who draws on inherent magic from a gift or bloodline',
-    primaryAbility: 'Charisma',
+    primaryAbility: ABILITIES.CHARISMA,
     symbol: 'Sorcerer.jpg',
   });
   await sorcererClass.save();
@@ -115,7 +116,7 @@ const seed = async () => {
     name: 'Warlock',
     description:
       'A spellcaster who draws on a bargain with an extraplanar entity',
-    primaryAbility: 'Charisma',
+    primaryAbility: ABILITIES.CHARISMA,
     symbol: 'Warlock.jpg',
   });
   await warlockClass.save();
@@ -124,7 +125,7 @@ const seed = async () => {
     name: 'Wizard',
     description:
       'A scholarly magic-user capable of manipulating the structures of reality',
-    primaryAbility: 'Intelligence',
+    primaryAbility: ABILITIES.INTELLIGENCE,
     symbol: 'Wizard.jpg',
   });
   await wizardClass.save();
