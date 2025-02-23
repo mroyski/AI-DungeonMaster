@@ -1,3 +1,4 @@
+import styles from './Login.module.css';
 import React, { useState, useEffect } from 'react';
 import { useAuthContext } from '../lib/AuthContext';
 import { useRenderComponent } from '../lib/RenderComponentContext';
@@ -28,24 +29,32 @@ const Login: React.FC = () => {
   if (loggedIn) return null;
 
   return (
-    <form>
+    <form className={styles.loginForm} onSubmit={submitHandler}>
+      <label className={styles.loginLabel} htmlFor="username">Username</label>
       <input
+        className={styles.loginInput}
         type="text"
+        id="username"
         name="username"
-        placeholder="username"
+        placeholder="Enter username"
         value={username}
         onChange={(e) => setUsername(e.target.value)}
         required
       />
+
+      <label className={styles.loginLabel} htmlFor="password">Password</label>
       <input
+        className={styles.loginInput}
         type="password"
+        id="password"
         name="password"
-        placeholder="password"
+        placeholder="Enter password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         required
       />
-      <input type="submit" value="submit" onClick={submitHandler} />
+
+      <button className={styles.loginButton} type="submit">Login</button>
     </form>
   );
 };
