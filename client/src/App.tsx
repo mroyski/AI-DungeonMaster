@@ -9,15 +9,13 @@ import PlayersOnline from './components/PlayersOnline';
 import Rooms from './components/Rooms';
 import Login from './components/Login';
 import { useAuthContext } from './lib/AuthContext';
-import { useSocketContext } from './lib/SocketContext';
 import { useRenderComponent } from './lib/RenderComponentContext';
 import { RenderComponentName } from './constants';
 import CreatePlayer from './components/CreatePlayer';
 
 const App: React.FC = () => {
-  const { player, players, messages } = usePlayerContext();
+  const { players } = usePlayerContext();
   const { logout } = useAuthContext();
-  const { room } = useSocketContext();
   const { activeComponent, setActiveComponent } = useRenderComponent();
 
   const logoutHandler = () => {
@@ -36,9 +34,7 @@ const App: React.FC = () => {
       case RenderComponentName.PLAYER_CREATE:
         return <CreatePlayer />;
       case RenderComponentName.CHAT:
-        return (
-          <Chat messages={messages} player={player} roomSelected={!!room} />
-        );
+        return <Chat />;
       case RenderComponentName.PLAYERS:
         return <Players players={players} />;
       case RenderComponentName.ROOMS:

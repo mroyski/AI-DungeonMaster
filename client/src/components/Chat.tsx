@@ -1,22 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styles from './Chat.module.css';
-import { Player } from '../interfaces/Player.interface';
-import { Message } from '../interfaces/Message.interface';
 import { useSocketContext } from '../lib/SocketContext';
+import { usePlayerContext } from '../lib/PlayerContext';
 
-interface Props {
-  messages: Array<Message>;
-  player: Player | null;
-  roomSelected: Boolean;
-}
-
-
-const Chat: React.FC<Props> = ({
-  messages,
-  player,
-  roomSelected,
-}) => {
-  const { sendMessage } = useSocketContext();
+const Chat: React.FC = () => {
+  const { sendMessage, room } = useSocketContext();
+  const { player, messages } = usePlayerContext();
   const [inputMessage, setInputMessage] = useState<string>('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -37,8 +26,7 @@ const Chat: React.FC<Props> = ({
   };
 
   if (!player) return <p className={styles.error}>Please select a player!</p>;
-  if (!roomSelected)
-    return <p className={styles.error}>Please select a room!</p>;
+  if (!room) return <p className={styles.error}>Please select a room!</p>;
 
   return (
     <div className={styles.chatContainer}>
