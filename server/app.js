@@ -178,10 +178,7 @@ connectInMemory().then(() => {
       console.log(`${player.name} joined room: ${room}`);
 
       const roomToJoin = await Room.findById(room);
-      const playerInRoom = await Room.findOne({
-        _id: room,
-        players: player,
-      });
+      const playerInRoom = roomToJoin.players.some((p) => p.equals(player));
 
       if (!playerInRoom) {
         roomToJoin.players.push(player);

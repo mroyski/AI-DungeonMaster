@@ -3,6 +3,7 @@ import io, { Socket } from 'socket.io-client';
 import { usePlayerContext } from './PlayerContext';
 import { useAuthContext } from './AuthContext';
 import { Message } from '../interfaces/Message.interface';
+import { Room } from '../interfaces/Room.interface';
 
 const SERVER_URL = process.env.REACT_APP_SERVER_URL || 'http://localhost:8080';
 
@@ -27,12 +28,13 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
   const { loggedIn } = useAuthContext();
   const [socket, setSocket] = useState<CustomSocket | null>(null);
   const [allRooms, setAllRooms] = useState([]);
-  const [room, setRoom] = useState();
+
+  const [room, setRoom] = useState<Room | null>(null);
 
   const sendMessage = (e: React.FormEvent<HTMLFormElement>, text: string) => {
     e.preventDefault();
     if (text.trim() !== '' && socket && player) {
-      socket.emit('chat message', { text, player: player, room: room });
+      socket.emit('chat message', { text, player: player, room: room?.id });
     }
   };
 

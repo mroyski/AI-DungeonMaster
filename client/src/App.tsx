@@ -15,7 +15,7 @@ import CreatePlayer from './components/CreatePlayer';
 
 const App: React.FC = () => {
   const { players } = usePlayerContext();
-  const { logout } = useAuthContext();
+  const { logout, loggedIn } = useAuthContext();
   const { activeComponent, setActiveComponent } = useRenderComponent();
 
   const logoutHandler = () => {
@@ -24,6 +24,10 @@ const App: React.FC = () => {
   };
 
   const renderComponent = () => {
+    if (!loggedIn) {
+      return <Login />;
+    }
+    
     switch (activeComponent) {
       case RenderComponentName.LOGIN:
         return <Login />;

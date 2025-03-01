@@ -4,6 +4,11 @@ const roomSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
     inProgress: { type: Boolean, required: true, default: false },
+    owner: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Player',
+      required: true,
+    },
     players: [
       { type: mongoose.Schema.Types.ObjectId, ref: 'Player', default: [] },
     ],
