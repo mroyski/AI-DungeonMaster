@@ -1,0 +1,443 @@
+# Room Creation Implementation Plan
+
+## Current State Assessment
+✅ Room model has `owner` field referencing Player  
+✅ Room interface exists with basic properties  
+✅ Frontend room joining flow with modals  
+✅ Socket context manages room state  
+❌ No room creation endpoint  
+❌ No room creation UI  
+❌ Room interface missing owner property  
+
+## Implementation Tasks
+
+### Phase 1: Backend Room Creation API
+
+#### 1. Add Room Creation Endpoint
+**File:** `server/app.js`
+```javascript
+// Add after existing routes, before server.listen()
+app.post('/rooms', async (req, res) => {
+  const { name, playerId } = req.body;
+  
+  try {
+    // Validate inputs
+    if (!name || !playerId) {
+      return res.status(400).json({ message: 'Room name and player ID required' });
+    }
+    
+    // Verify player exists
+    const player = await Player.findById(playerId);
+    if (!player) {
+      return res.status(404).json({ message: 'Player not found' });
+    }
+    
+    // Create room
+    const room = new Room({
+      name: name.trim(),
+      owner: player._id,
+      players: [player._id], // Owner automatically joins
+    });
+    
+    await room.save();
+    
+    // Populate owner for response
+    await room.populate('owner');
+    
+    res.status(201).json({
+      id: room._id.toString(),
+      name: room.name,
+      owner: room.owner,
+      inProgress: room.inProgress
+    });
+    
+  } catch (error) {
+    console.error('Room creation error:', error);
+    res.status(500).json({ message: 'Failed to create room' });
+  }
+});
+```
+
+#### 2. Add Room Listing Endpoint Enhancement
+**File:** `server/app.js`
+```javascript
+// Update existing all rooms emission to include owner
+// In the connection handler, modify:
+let allRooms = await Room.find().populate('owner', 'name');
+allRooms = allRooms.map((room) => {
+  return { 
+    id: room._id.toString(), 
+    name: room.name,
+    owner: room.owner ? room.owner.name : 'Unknown',
+    ownerId: room.owner ? room.owner._id.toString() : null
+  };
+});
+```
+
+### Phase 2: Frontend Room Creation UI
+
+#### 3. Update Room Interface
+**File:** `client/src/interfaces/Room.interface.tsx`
+```typescript
+export interface Room {
+  id: string;
+  name: string;
+  owner?: string; // Owner player name
+  ownerId?: string; // Owner player ID
+  inProgress?: boolean;
+}
+```
+
+#### 4. Create Room Creation Modal Component
+**File:** `client/src/components/CreateRoomModal.tsx`
+```typescript
+import React, { useState } from 'react';
+import { usePlayerContext } from '../lib/PlayerContext';
+import { useAuthContext } from '../lib/AuthContext';
+import styles from './CreateRoomModal.module.css';
+
+interface CreateRoomModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onRoomCreated: (room: any) => void;
+}
+
+const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
+  isOpen,
+  onClose,
+  onRoomCreated
+}) => {
+  const [roomName, setRoomName] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const { player } = usePlayerContext();
+  const { user } = useAuthContext();
+  
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!roomName.trim()) {
+      setError('Room name is required');
+      return;
+    }
+    
+    if (!player) {
+      setError('Please select a player first');
+      return;
+    }
+    
+    setIsLoading(true);
+    setError('');
+    
+    try {
+      const response = await fetch(`${process.env.REACT_APP_SERVER_URL}/rooms`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: roomName.trim(),
+          playerId: player.id
+        }),
+      });
+      
+      if (response.ok) {
+        const newRoom = await response.json();
+        onRoomCreated(newRoom);
+        setRoomName('');
+        onClose();
+      } else {
+        const errorData = await response.json();
+        setError(errorData.message || 'Failed to create room');
+      }
+    } catch (err) {
+      setError('Network error. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  if (!isOpen) return null;
+  
+  return (
+    <div className={styles.modal}>
+      <div className={styles.modalContent}>
+        <h3>Create New Room</h3>
+        <form onSubmit={handleSubmit}>
+          <div className={styles.inputGroup}>
+            <label htmlFor="roomName">Room Name:</label>
+            <input
+              type="text"
+              id="roomName"
+              value={roomName}
+              onChange={(e) => setRoomName(e.target.value)}
+              placeholder="Enter room name..."
+              maxLength={50}
+              disabled={isLoading}
+            />
+          </div>
+          
+          {error && <div className={styles.error}>{error}</div>}
+          
+          <div className={styles.buttonGroup}>
+            <button 
+              type="submit" 
+              disabled={isLoading || !roomName.trim()}
+              className={styles.createButton}
+            >
+              {isLoading ? 'Creating...' : 'Create Room'}
+            </button>
+            <button 
+              type="button" 
+              onClick={onClose}
+              disabled={isLoading}
+              className={styles.cancelButton}
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default CreateRoomModal;
+```
+
+#### 5. Create Modal Styles
+**File:** `client/src/components/CreateRoomModal.module.css`
+```css
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  background-color: #222831;
+  border: 2px solid #393e46;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  color: white;
+  width: 400px;
+  max-width: 90vw;
+}
+
+.modalContent h3 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #ff5252;
+}
+
+.inputGroup {
+  margin-bottom: 20px;
+}
+
+.inputGroup label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+
+.inputGroup input {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #393e46;
+  border-radius: 5px;
+  background-color: #2c3941;
+  color: white;
+  font-size: 16px;
+}
+
+.inputGroup input:focus {
+  outline: none;
+  border-color: #ff5252;
+}
+
+.inputGroup input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.error {
+  color: #ff5252;
+  font-size: 14px;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.createButton, .cancelButton {
+  padding: 12px 24px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px;
+  border: none;
+  transition: background-color 0.3s ease;
+  min-width: 120px;
+}
+
+.createButton {
+  background-color: #ff5252;
+  color: white;
+}
+
+.createButton:hover:not(:disabled) {
+  background-color: #fa8072;
+}
+
+.createButton:disabled {
+  background-color: #666;
+  cursor: not-allowed;
+}
+
+.cancelButton {
+  background-color: #393e46;
+  color: white;
+}
+
+.cancelButton:hover:not(:disabled) {
+  background-color: #2c3941;
+}
+```
+
+#### 6. Update Rooms Component
+**File:** `client/src/components/Rooms.tsx`
+```typescript
+// Add imports
+import CreateRoomModal from './CreateRoomModal';
+
+// Add state for create room modal
+const [createRoomModalOpen, setCreateRoomModalOpen] = useState(false);
+
+// Add handler for room creation
+const handleRoomCreated = (newRoom: any) => {
+  // The room will be added to allRooms via socket emission from server
+  // Optionally show success message
+  console.log('Room created:', newRoom);
+};
+
+// Add create room button before the room list
+return (
+  <div>
+    <div style={{ marginBottom: '20px', textAlign: 'center' }}>
+      <button 
+        onClick={() => setCreateRoomModalOpen(true)}
+        style={{
+          padding: '12px 24px',
+          backgroundColor: '#ff5252',
+          color: 'white',
+          border: 'none',
+          borderRadius: '5px',
+          cursor: 'pointer',
+          fontSize: '16px'
+        }}
+      >
+        Create New Room
+      </button>
+    </div>
+    
+    {/* Existing room list */}
+    {allRooms.map((r) => (
+      <div key={r.id}>
+        <div>
+          <strong>{r.name}</strong>
+          {r.owner && <small> (Owner: {r.owner})</small>}
+        </div>
+        <button onClick={() => openJoinRoomModal(r)}>
+          Join Room
+        </button>
+        <hr />
+      </div>
+    ))}
+    
+    {/* Existing join modal */}
+    {modalOpen && selectedRoom && (
+      // ... existing modal code
+    )}
+    
+    {/* Add create room modal */}
+    <CreateRoomModal
+      isOpen={createRoomModalOpen}
+      onClose={() => setCreateRoomModalOpen(false)}
+      onRoomCreated={handleRoomCreated}
+    />
+  </div>
+);
+```
+
+### Phase 3: Real-time Updates
+
+#### 7. Add Socket Events for Room Creation
+**File:** `server/app.js`
+```javascript
+// Add after room creation in POST /rooms endpoint
+// Emit to all connected clients
+io.emit('room created', {
+  id: room._id.toString(),
+  name: room.name,
+  owner: room.owner.name,
+  ownerId: room.owner._id.toString()
+});
+```
+
+#### 8. Update Socket Context to Handle New Rooms
+**File:** `client/src/lib/SocketContext.tsx`
+```typescript
+// Add in useEffect where other socket listeners are
+socket.on('room created', (newRoom) => {
+  setAllRooms(prev => [...prev, newRoom]);
+});
+```
+
+## Testing Checklist
+
+### Manual Testing Steps:
+1. ✅ Login with valid user
+2. ✅ Select a player character  
+3. ✅ Navigate to Rooms view
+4. ✅ Click "Create New Room"
+5. ✅ Enter room name and submit
+6. ✅ Verify room appears in list with owner name
+7. ✅ Verify other users see the new room
+8. ✅ Verify owner can join their own room
+9. ✅ Test error cases (empty name, no player selected)
+
+### Error Cases to Handle:
+- Empty room name
+- No player selected
+- Duplicate room names (if desired)
+- Network errors
+- Server errors
+
+## Future Enhancements (Post-MVP):
+- Room deletion by owner
+- Room settings (private/public, max players)
+- Room search/filtering
+- Room categories
+- Transfer ownership
+- Room descriptions
+
+## Implementation Order:
+1. Backend: Room creation endpoint
+2. Frontend: Room interface updates
+3. Frontend: Create room modal component
+4. Frontend: Update Rooms component
+5. Real-time: Socket events for room updates
+6. Testing: Manual testing and bug fixes
+7. Polish: Error handling and UX improvements
