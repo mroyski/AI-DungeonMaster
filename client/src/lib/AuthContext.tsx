@@ -29,10 +29,11 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
       body: JSON.stringify({ username, password }),
     };
 
-    const response = await fetch(`${serverURL}/login`, loginOptions);
+    const response = await fetch(`${serverURL}/auth/login`, loginOptions);
     if (response.ok) {
-      const { id, username } = await response.json();
-      setUser({ id, username });
+      const result = await response.json();
+      const userData = result.data;
+      setUser({ id: userData.id, username: userData.username });
       setLoggedIn(true);
     }
   };
