@@ -13,9 +13,9 @@ interface CustomSocket extends Socket {
 
 interface SocketContextType {
   socket: CustomSocket | null;
-  allRooms: any[];
-  setRoom: React.Dispatch<React.SetStateAction<any>>;
-  room: any;
+  allRooms: Room[];
+  setRoom: React.Dispatch<React.SetStateAction<Room | null>>;
+  room: Room | null;
   sendMessage: (e: React.FormEvent<HTMLFormElement>, text: string) => void;
 }
 
@@ -27,7 +27,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
   const { player, setPlayers, setMessages } = usePlayerContext();
   const { loggedIn } = useAuthContext();
   const [socket, setSocket] = useState<CustomSocket | null>(null);
-  const [allRooms, setAllRooms] = useState([]);
+  const [allRooms, setAllRooms] = useState<Room[]>([]);
 
   const [room, setRoom] = useState<Room | null>(null);
 
@@ -59,8 +59,17 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
         socket.userID = userID;
       });
 
-      socket.on('all rooms', (data) => {
-        setAllRooms(data);
+      socket.on('all rooms', (rooms: Room[]) => {
+        console.log('Received all rooms:', rooms);
+        setAllRooms(rooms);
+      });
+
+      socket.on('room created', (newRoom: Room) => {
+        setAllRooms(prevRooms => [...prevRooms, newRoom]);
+      });
+
+      socket.on('room deleted', (data: { id: string }) => {
+        setAllRooms(prevRooms => prevRooms.filter(room => room.id !== data.id));
       });
 
       socket.on('chat message', (data: Message) => {

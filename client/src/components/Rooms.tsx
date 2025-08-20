@@ -4,6 +4,7 @@ import { useSocketContext } from '../lib/SocketContext';
 import { useRenderComponent } from '../lib/RenderComponentContext';
 import { RenderComponentName } from '../constants';
 import styles from './Rooms.module.css';
+import CreateRoomModal from './CreateRoomModal';
 
 const Rooms: React.FC = () => {
   const { setActiveComponent } = useRenderComponent();
@@ -12,6 +13,7 @@ const Rooms: React.FC = () => {
 
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState<any>(null);
+  const [createRoomModalOpen, setCreateRoomModalOpen] = useState(false);
 
   const joinRoom = (roomToJoin: any) => {
     if (roomToJoin?.id === room?.id) {
@@ -33,6 +35,10 @@ const Rooms: React.FC = () => {
     setModalOpen(false);
   };
 
+  const handleRoomCreated = () => {
+    console.log('Room created successfully');
+  };
+
   const openJoinRoomModal = (room: any) => {
     setSelectedRoom(room);
     setModalOpen(true);
@@ -48,30 +54,70 @@ const Rooms: React.FC = () => {
   if (!allRooms.length) return <p>No available Rooms</p>;
 
   return (
-    <div>
-      {allRooms.map((r) => (
-        <div key={r.id}>
-          <div>{r.name}</div>
-          <button onClick={() => openJoinRoomModal(r)}>
-            Join Room {r.id}
+    <div className={styles.outerContainer}>
+      <div className={styles.container}>
+        <h1>Rooms</h1>
+        
+        <div style={{ marginBottom: '20px', textAlign: 'center' }}>
+          <button 
+            onClick={() => setCreateRoomModalOpen(true)}
+            style={{
+              padding: '12px 24px',
+              backgroundColor: '#ff5252',
+              color: 'white',
+              border: 'none',
+              borderRadius: '5px',
+              cursor: 'pointer',
+              fontSize: '16px'
+            }}
+          >
+            Create New Room
           </button>
-          <hr />
         </div>
-      ))}
-
-      {modalOpen && selectedRoom && (
-        <div className={styles.modal}>
-          <div className={styles.modalContent}>
-            <p className={styles.modalText}>Do you want to join room {selectedRoom.name}?</p>
-            <button className={`${styles.button} ${styles.confirmButton}`} onClick={() => joinRoom(selectedRoom)}>
-              Yes
-            </button>
-            <button className={`${styles.button} ${styles.cancelButton}`} onClick={closeModal}>
-              Cancel
+        
+        {allRooms.map((r) => (
+          <div key={r.id} className={styles.roomContainer}>
+            <div className={styles.roomInfo}>
+              <strong>{r.name}</strong>
+              {r.owner && <small> (Owner: {r.owner})</small>}
+            </div>
+            <button 
+              className={styles.joinButton}
+              onClick={() => openJoinRoomModal(r)}
+            >
+              Join Room
             </button>
           </div>
-        </div>
-      )}
+        ))}
+
+        <CreateRoomModal
+          isOpen={createRoomModalOpen}
+          onClose={() => setCreateRoomModalOpen(false)}
+          onRoomCreated={handleRoomCreated}
+        />
+        
+        {modalOpen && selectedRoom && (
+          <div className={styles.modal}>
+            <div className={styles.modalContent}>
+              <p className={styles.modalText}>
+                Do you want to join room {selectedRoom.name}?
+              </p>
+              <button
+                className={`${styles.button} ${styles.confirmButton}`}
+                onClick={() => joinRoom(selectedRoom)}
+              >
+                Yes
+              </button>
+              <button
+                className={`${styles.button} ${styles.cancelButton}`}
+                onClick={closeModal}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
