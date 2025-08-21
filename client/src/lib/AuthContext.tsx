@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 interface AuthContextType {
-  loggedIn: Boolean;
+  loggedIn: boolean;
   login: (username: string, password: string) => void;
   logout: () => void;
   user: UserData | null;
@@ -17,7 +17,7 @@ const AuthContext = createContext<AuthContextType | null>(null);
 const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const serverURL = process.env.REACT_APP_SERVER_URL;
 
-  const [loggedIn, setLoggedIn] = useState<Boolean>(false);
+  const [loggedIn, setLoggedIn] = useState<boolean>(false);
   const [user, setUser] = useState<UserData | null>(null);
 
   const login = async (username: string, password: string) => {
@@ -29,10 +29,11 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
       body: JSON.stringify({ username, password }),
     };
 
-    const response = await fetch(`${serverURL}/login`, loginOptions);
+    const response = await fetch(`${serverURL}/auth/login`, loginOptions);
     if (response.ok) {
-      const { id, username } = await response.json();
-      setUser({ id, username });
+      const result = await response.json();
+      const userData = result.data;
+      setUser({ id: userData.id, username: userData.username });
       setLoggedIn(true);
     }
   };

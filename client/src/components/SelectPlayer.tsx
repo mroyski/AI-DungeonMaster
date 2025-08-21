@@ -26,7 +26,8 @@ const SelectPlayer: React.FC = () => {
     if (user && loggedIn) {
       fetch(`${serverURL}/users/${user.id}/players`)
         .then((res) => res.json())
-        .then((res) => setPlayers(res))
+        .then((res) => setPlayers(res.data))
+        .then((res) => console.log(res))
         .catch((error) => {
           console.log(error);
         });

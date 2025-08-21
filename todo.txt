@@ -1,11 +1,17 @@
 Client
+- Add game owner (they will approve join requests) -> See game-owner-implementation-plan.txt
+    - can they only be in 1 game?
+    - is the owner of the game at the player or user level? (player i think?)
+- Allow user to select player after attempting to join room (right now need player selected)
+- Create Room type definition
 - Add ability to create a custom character -> WIP
-- Add ability for new chatters to join the game by sending a message to the DM or clicking a button
+- Add ability for new players to join the game by sending a message to the DM or clicking a button
     - maybe a modal when going through join room flow which submits form to join room
     - this should trigger a message to the DM?
 - Add friends list and display friends who are connected via web socket
 - Tell the DM information about the character who started the game so they don't have to do it manually
 - Add view to search available rooms to join
+- add button to send to DM vs regular send, or ctrl + enter shortcut, something...
 
 Server
 - Save chat history

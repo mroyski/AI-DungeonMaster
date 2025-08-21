@@ -1,4 +1,5 @@
 export interface Player {
+  _id: string;
   name: string;
   playerClass: PlayerClass;
   user: string;

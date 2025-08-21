@@ -158,8 +158,12 @@ const seed = async () => {
   });
   await player2.save();
 
-  await new Room({ name: 'Crusader Strike' }).save();
-  await new Room({ name: 'Kel Thuzad' }).save();
+  await new Room({
+    name: 'Crusader Strike',
+    owner: player1,
+    players: [player1],
+  }).save();
+  // await new Room({ name: 'Kel Thuzad' }).save();
 };
 
 module.exports = { connectInMemory };

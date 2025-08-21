@@ -1,0 +1,461 @@
+# Express.js Controller Architecture Options
+
+## Option 1: Express Router with Controller Classes (Most .NET-like)
+
+### File Structure:
+```
+server/
+├── app.js                 # Main app setup
+├── controllers/
+│   ├── AuthController.js
+│   ├── RoomController.js
+│   ├── PlayerController.js
+│   └── BaseController.js
+├── routes/
+│   ├── index.js           # Route aggregator
+│   ├── auth.js
+│   ├── rooms.js
+│   └── players.js
+├── middleware/
+│   ├── auth.js
+│   └── validation.js
+├── services/
+│   ├── RoomService.js
+│   └── MessageService.js
+└── models/ (existing)
+```
+
+### Example Implementation:
+
+**controllers/BaseController.js** (Common functionality)
+```javascript
+class BaseController {
+  success(res, data, message = 'Success') {
+    return res.status(200).json({
+      success: true,
+      message,
+      data
+    });
+  }
+
+  created(res, data, message = 'Created successfully') {
+    return res.status(201).json({
+      success: true,
+      message,
+      data
+    });
+  }
+
+  badRequest(res, message = 'Bad request') {
+    return res.status(400).json({
+      success: false,
+      message
+    });
+  }
+
+  notFound(res, message = 'Not found') {
+    return res.status(404).json({
+      success: false,
+      message
+    });
+  }
+
+  serverError(res, message = 'Internal server error') {
+    return res.status(500).json({
+      success: false,
+      message
+    });
+  }
+}
+
+module.exports = BaseController;
+```
+
+**controllers/RoomController.js**
+```javascript
+const BaseController = require('./BaseController');
+const Room = require('../models/room');
+const Player = require('../models/player');
+
+class RoomController extends BaseController {
+  async getAllRooms(req, res) {
+    try {
+      const rooms = await Room.find().populate('owner', 'name');
+      const formattedRooms = rooms.map(room => ({
+        id: room._id.toString(),
+        name: room.name,
+        owner: room.owner ? room.owner.name : 'Unknown',
+        ownerId: room.owner ? room.owner._id.toString() : null,
+        inProgress: room.inProgress
+      }));
+      
+      return this.success(res, formattedRooms);
+    } catch (error) {
+      console.error('Get rooms error:', error);
+      return this.serverError(res, 'Failed to fetch rooms');
+    }
+  }
+
+  async createRoom(req, res) {
+    try {
+      const { name, playerId } = req.body;
+      
+      // Validation
+      if (!name || !playerId) {
+        return this.badRequest(res, 'Room name and player ID required');
+      }
+      
+      // Verify player exists
+      const player = await Player.findById(playerId);
+      if (!player) {
+        return this.notFound(res, 'Player not found');
+      }
+      
+      // Create room
+      const room = new Room({
+        name: name.trim(),
+        owner: player._id,
+        players: [player._id],
+      });
+      
+      await room.save();
+      await room.populate('owner');
+      
+      const roomData = {
+        id: room._id.toString(),
+        name: room.name,
+        owner: room.owner,
+        inProgress: room.inProgress
+      };
+      
+      // Emit to all clients (you'd inject io or use event emitter)
+      req.io?.emit('room created', roomData);
+      
+      return this.created(res, roomData);
+    } catch (error) {
+      console.error('Room creation error:', error);
+      return this.serverError(res, 'Failed to create room');
+    }
+  }
+
+  async getRoomById(req, res) {
+    try {
+      const { id } = req.params;
+      const room = await Room.findById(id).populate('owner players');
+      
+      if (!room) {
+        return this.notFound(res, 'Room not found');
+      }
+      
+      return this.success(res, room);
+    } catch (error) {
+      console.error('Get room error:', error);
+      return this.serverError(res, 'Failed to fetch room');
+    }
+  }
+
+  async deleteRoom(req, res) {
+    try {
+      const { id } = req.params;
+      const { playerId } = req.body;
+      
+      const room = await Room.findById(id);
+      if (!room) {
+        return this.notFound(res, 'Room not found');
+      }
+      
+      // Check if player is owner
+      if (room.owner.toString() !== playerId) {
+        return res.status(403).json({
+          success: false,
+          message: 'Only room owner can delete the room'
+        });
+      }
+      
+      await Room.findByIdAndDelete(id);
+      req.io?.emit('room deleted', { id });
+      
+      return this.success(res, null, 'Room deleted successfully');
+    } catch (error) {
+      console.error('Delete room error:', error);
+      return this.serverError(res, 'Failed to delete room');
+    }
+  }
+}
+
+module.exports = new RoomController();
+```
+
+**routes/rooms.js**
+```javascript
+const express = require('express');
+const router = express.Router();
+const RoomController = require('../controllers/RoomController');
+
+router.get('/', RoomController.getAllRooms.bind(RoomController));
+router.post('/', RoomController.createRoom.bind(RoomController));
+router.get('/:id', RoomController.getRoomById.bind(RoomController));
+router.delete('/:id', RoomController.deleteRoom.bind(RoomController));
+
+module.exports = router;
+```
+
+**controllers/AuthController.js**
+```javascript
+const BaseController = require('./BaseController');
+const User = require('../models/user');
+
+class AuthController extends BaseController {
+  async login(req, res) {
+    try {
+      const { username, password } = req.body;
+      
+      if (!username || !password) {
+        return this.badRequest(res, 'Username and password required');
+      }
+      
+      const user = await User.findOne({ username });
+      if (!user || !user.passwordMatch(password)) {
+        return res.status(401).json({
+          success: false,
+          message: 'Incorrect username or password'
+        });
+      }
+      
+      return this.success(res, {
+        id: user.id,
+        username: user.username
+      }, 'Login successful');
+    } catch (error) {
+      console.error('Login error:', error);
+      return this.serverError(res, 'Login unsuccessful');
+    }
+  }
+}
+
+module.exports = new AuthController();
+```
+
+**routes/auth.js**
+```javascript
+const express = require('express');
+const router = express.Router();
+const AuthController = require('../controllers/AuthController');
+
+router.post('/login', AuthController.login.bind(AuthController));
+
+module.exports = router;
+```
+
+**routes/index.js** (Route aggregator)
+```javascript
+const express = require('express');
+const router = express.Router();
+
+const authRoutes = require('./auth');
+const roomRoutes = require('./rooms');
+const playerRoutes = require('./players');
+
+router.use('/auth', authRoutes);
+router.use('/rooms', roomRoutes);
+router.use('/players', playerRoutes);
+
+module.exports = router;
+```
+
+**Updated app.js** (Much cleaner!)
+```javascript
+require('dotenv-flow').config();
+const express = require('express');
+const { createServer } = require('node:http');
+const cors = require('cors');
+const { connectInMemory } = require('./db/seed');
+const routes = require('./routes');
+const socketHandler = require('./socketHandler'); // Move socket logic here
+
+const PORT = process.env.PORT || 8080;
+const app = express();
+const server = createServer(app);
+const io = require('socket.io')(server, {
+  cors: {
+    origin: process.env.CLIENT_URL,
+    methods: ['GET', 'POST'],
+    credentials: true,
+  },
+});
+
+// Middleware
+app.use(cors());
+app.use(express.json());
+
+// Make io available to controllers
+app.use((req, res, next) => {
+  req.io = io;
+  next();
+});
+
+// Routes
+app.use('/api', routes);
+
+// Socket handling
+socketHandler(io);
+
+// Start server
+connectInMemory().then(() => {
+  server.listen(PORT, () =>
+    console.log(`server running at http://localhost:${PORT}`)
+  );
+});
+```
+
+## Option 2: Functional Controllers (Lighter approach)
+
+**controllers/roomController.js**
+```javascript
+const Room = require('../models/room');
+const Player = require('../models/player');
+
+const getAllRooms = async (req, res) => {
+  try {
+    const rooms = await Room.find().populate('owner', 'name');
+    res.json(rooms.map(room => ({
+      id: room._id.toString(),
+      name: room.name,
+      owner: room.owner?.name,
+      ownerId: room.owner?._id.toString()
+    })));
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch rooms' });
+  }
+};
+
+const createRoom = async (req, res) => {
+  try {
+    const { name, playerId } = req.body;
+    
+    if (!name || !playerId) {
+      return res.status(400).json({ message: 'Room name and player ID required' });
+    }
+    
+    const player = await Player.findById(playerId);
+    if (!player) {
+      return res.status(404).json({ message: 'Player not found' });
+    }
+    
+    const room = new Room({
+      name: name.trim(),
+      owner: player._id,
+      players: [player._id],
+    });
+    
+    await room.save();
+    await room.populate('owner');
+    
+    req.io?.emit('room created', room);
+    res.status(201).json(room);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to create room' });
+  }
+};
+
+module.exports = {
+  getAllRooms,
+  createRoom
+};
+```
+
+## Option 3: Service Layer Pattern (Enterprise-like)
+
+**services/RoomService.js**
+```javascript
+const Room = require('../models/room');
+const Player = require('../models/player');
+
+class RoomService {
+  async getAllRooms() {
+    const rooms = await Room.find().populate('owner', 'name');
+    return rooms.map(room => ({
+      id: room._id.toString(),
+      name: room.name,
+      owner: room.owner?.name,
+      ownerId: room.owner?._id.toString(),
+      inProgress: room.inProgress
+    }));
+  }
+
+  async createRoom(name, playerId) {
+    if (!name || !playerId) {
+      throw new Error('Room name and player ID required');
+    }
+
+    const player = await Player.findById(playerId);
+    if (!player) {
+      throw new Error('Player not found');
+    }
+
+    const room = new Room({
+      name: name.trim(),
+      owner: player._id,
+      players: [player._id],
+    });
+
+    await room.save();
+    await room.populate('owner');
+    return room;
+  }
+
+  async getRoomById(id) {
+    const room = await Room.findById(id).populate('owner players');
+    if (!room) {
+      throw new Error('Room not found');
+    }
+    return room;
+  }
+}
+
+module.exports = new RoomService();
+```
+
+**controllers/RoomController.js** (Using service)
+```javascript
+const BaseController = require('./BaseController');
+const RoomService = require('../services/RoomService');
+
+class RoomController extends BaseController {
+  async getAllRooms(req, res) {
+    try {
+      const rooms = await RoomService.getAllRooms();
+      return this.success(res, rooms);
+    } catch (error) {
+      return this.serverError(res, error.message);
+    }
+  }
+
+  async createRoom(req, res) {
+    try {
+      const { name, playerId } = req.body;
+      const room = await RoomService.createRoom(name, playerId);
+      
+      req.io?.emit('room created', room);
+      return this.created(res, room);
+    } catch (error) {
+      return this.badRequest(res, error.message);
+    }
+  }
+}
+
+module.exports = new RoomController();
+```
+
+## Recommendation:
+
+I'd recommend **Option 1** (Controller Classes) for your project because:
+
+1. **Most .NET-like** - Similar to .NET API controllers
+2. **Scalable** - Easy to add new endpoints and features
+3. **Organized** - Clear separation of concerns
+4. **Testable** - Controllers can be easily unit tested
+5. **Consistent** - BaseController ensures consistent response format
+6. **Maintainable** - Each feature has its own controller
+
+You can implement this incrementally by moving one endpoint at a time from app.js to the new structure.
