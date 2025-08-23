@@ -5,13 +5,14 @@ import { useRenderComponent } from '../lib/RenderComponentContext';
 import { RenderComponentName } from '../constants';
 import styles from './Rooms.module.css';
 import CreateRoomModal from './CreateRoomModal';
+import JoinRoomModal from './JoinRoomModal';
 
 const Rooms: React.FC = () => {
   const { setActiveComponent } = useRenderComponent();
   const { socket, room, setRoom, allRooms } = useSocketContext();
   const { player, setMessages } = usePlayerContext();
 
-  const [modalOpen, setModalOpen] = useState(false);
+  const [joinRoomModalOpen, setJoinRoomModalOpen] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState<any>(null);
   const [createRoomModalOpen, setCreateRoomModalOpen] = useState(false);
 
@@ -32,7 +33,7 @@ const Rooms: React.FC = () => {
     setMessages([]);
     setRoom(roomToJoin);
     setActiveComponent(RenderComponentName.CHAT);
-    setModalOpen(false);
+    setJoinRoomModalOpen(false);
   };
 
   const handleRoomCreated = () => {
@@ -41,11 +42,11 @@ const Rooms: React.FC = () => {
 
   const openJoinRoomModal = (room: any) => {
     setSelectedRoom(room);
-    setModalOpen(true);
+    setJoinRoomModalOpen(true);
   };
 
   const closeModal = () => {
-    setModalOpen(false);
+    setJoinRoomModalOpen(false);
     setSelectedRoom(null);
   };
 
@@ -88,27 +89,12 @@ const Rooms: React.FC = () => {
           onRoomCreated={handleRoomCreated}
         />
         
-        {modalOpen && selectedRoom && (
-          <div className={styles.modal}>
-            <div className={styles.modalContent}>
-              <p className={styles.modalText}>
-                Do you want to join room {selectedRoom.name}?
-              </p>
-              <button
-                className={`${styles.button} ${styles.confirmButton}`}
-                onClick={() => joinRoom(selectedRoom)}
-              >
-                Yes
-              </button>
-              <button
-                className={`${styles.button} ${styles.cancelButton}`}
-                onClick={closeModal}
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        )}
+        <JoinRoomModal
+          isOpen={joinRoomModalOpen}
+          room={selectedRoom}
+          onConfirm={() => joinRoom(selectedRoom)}
+          onCancel={closeModal}
+        />
       </div>
     </div>
   );
