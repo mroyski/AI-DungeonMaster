@@ -8,6 +8,38 @@ To message the dungeon master, prefix your chat message with `/dm` i.e. `/dm sta
 
 ![AI-DungonMaster Screenshot](aidungeonmaster.png)
 
+## Architecture
+
+The AI Dungeon Master application is built with a modern web architecture featuring a React frontend, Node.js backend, and real-time communication via Socket.IO. The system integrates with OpenAI's GPT-4o-mini to provide an intelligent dungeon master experience.
+
+### System Overview
+
+```mermaid
+graph TB
+    Client[React Client App<br/>- Player creation<br/>- Room management<br/>- Chat interface]
+    
+    Server[Node.js Server<br/>- Express API<br/>- Socket.IO<br/>- Authentication]
+    
+    Database[(MongoDB<br/>Users, Players<br/>Rooms, Messages)]
+    
+    ChatGPT[OpenAI ChatGPT<br/>AI Dungeon Master]
+    
+    Client <-->|HTTP REST API<br/>Socket.IO| Server
+    Server --> Database
+    Server -->|/dm messages| ChatGPT
+    ChatGPT -->|AI responses| Server
+    Server -->|Real-time updates| Client
+```
+
+### Key Architectural Features
+
+- **React Context Architecture**: State management using multiple context providers for auth, player data, socket connections, and UI routing
+- **Real-time Communication**: Socket.IO for instant messaging, room updates, and multiplayer coordination
+- **AI Integration**: OpenAI GPT-4o-mini powers the dungeon master with D&D 5e rule knowledge
+- **RESTful API**: Express.js backend with organized routes and controllers for data operations
+- **MongoDB Integration**: Mongoose models for users, players, rooms, messages, and D&D character classes
+- **Session Management**: Persistent user sessions with automatic reconnection support
+
 ## Development
 
 ### Client
