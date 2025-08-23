@@ -53,3 +53,18 @@
 .cancelButton:hover {
   background-color: #2c3941;
 }
+
+.createRoomContainer {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.createRoomButton {
+  padding: 12px 24px;
+  background-color: #ff5252;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}

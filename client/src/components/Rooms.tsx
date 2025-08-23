@@ -58,18 +58,10 @@ const Rooms: React.FC = () => {
       <div className={styles.container}>
         <h1>Rooms</h1>
         
-        <div style={{ marginBottom: '20px', textAlign: 'center' }}>
+        <div className={styles.createRoomContainer}>
           <button 
+            className={styles.createRoomButton}
             onClick={() => setCreateRoomModalOpen(true)}
-            style={{
-              padding: '12px 24px',
-              backgroundColor: '#ff5252',
-              color: 'white',
-              border: 'none',
-              borderRadius: '5px',
-              cursor: 'pointer',
-              fontSize: '16px'
-            }}
           >
             Create New Room
           </button>
