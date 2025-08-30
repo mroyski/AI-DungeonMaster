@@ -3,7 +3,6 @@ Client
     - can they only be in 1 game?
     - is the owner of the game at the player or user level? (player i think?)
 - Allow user to select player after attempting to join room (right now need player selected)
-- Create Room type definition
 - Add ability to create a custom character -> WIP
 - Add ability for new players to join the game by sending a message to the DM or clicking a button
     - maybe a modal when going through join room flow which submits form to join room
@@ -11,9 +10,12 @@ Client
 - Add friends list and display friends who are connected via web socket
 - Tell the DM information about the character who started the game so they don't have to do it manually
 - Add view to search available rooms to join
-- add button to send to DM vs regular send, or ctrl + enter shortcut, something...
+- Add button to send to DM vs regular send, or ctrl + enter shortcut, something...
+- Add activiy view that updates with all recent activity, just for debugging but could be cool for users
+    - show when someone joins room or creates character, etc...
 
 Server
+- Update ChatGPT integration
 - Save chat history
     - Start with in memory (DONE), then move to long term storage (MongoDB?)
 - Setup private rooms
