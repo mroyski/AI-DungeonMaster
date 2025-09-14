@@ -13,6 +13,7 @@ Client
 - Add button to send to DM vs regular send, or ctrl + enter shortcut, something...
 - Add activiy view that updates with all recent activity, just for debugging but could be cool for users
     - show when someone joins room or creates character, etc...
+- Create Room card that stylishly shows room data in Rooms view
 
 Server
 - Update ChatGPT integration

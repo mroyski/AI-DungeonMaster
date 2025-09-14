@@ -111,11 +111,14 @@ const socketHandler = (io) => {
 
     let allRooms = await Room.find().populate('owner', 'name');
     allRooms = allRooms.map((room) => {
-      return { 
-        id: room._id.toString(), 
+      return {
+        id: room._id.toString(),
         name: room.name,
+        inProgress: room.inProgress,
+        maxPlayers: room.maxPlayers,
+        players: room.players,
         owner: room.owner ? room.owner.name : 'Unknown',
-        ownerId: room.owner ? room.owner._id.toString() : null
+        ownerId: room.owner ? room.owner._id.toString() : null,
       };
     });
 
@@ -163,7 +166,9 @@ const socketHandler = (io) => {
       console.log(`${player.name} joined room: ${room}`);
 
       const roomToJoin = await Room.findById(room);
-      const playerInRoom = roomToJoin.players.some((p) => p.equals(player));
+      const playerInRoom = roomToJoin.players.some((p) =>
+        p._id.equals(player._id)
+      );
 
       if (!playerInRoom) {
         roomToJoin.players.push(player);
@@ -177,6 +182,18 @@ const socketHandler = (io) => {
       }).populate('player');
 
       socket.emit('chat history', { chatHistory }, socket.id);
+
+      const updatedRoom = await Room.findById(room).populate('owner', 'name');
+      const formattedRoom = {
+        id: updatedRoom._id.toString(),
+        name: updatedRoom.name,
+        inProgress: updatedRoom.inProgress,
+        maxPlayers: updatedRoom.maxPlayers,
+        players: updatedRoom.players,
+        owner: updatedRoom.owner ? updatedRoom.owner.name : 'Unknown',
+        ownerId: updatedRoom.owner ? updatedRoom.owner._id.toString() : null,
+      };
+      io.emit('room updated', formattedRoom);
     });
 
     socket.on('leave room', ({ room, name }) => {

@@ -72,6 +72,11 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
         setAllRooms(prevRooms => prevRooms.filter(room => room.id !== data.id));
       });
 
+      socket.on('room updated', (room: Room) => {
+        console.log('Room updated:', room);
+        setAllRooms(prevRooms => prevRooms.map(r => r.id === room.id ? room : r));
+      })
+
       socket.on('chat message', (data: Message) => {
         setMessages((prevMessages) => [...prevMessages, data]);
       });

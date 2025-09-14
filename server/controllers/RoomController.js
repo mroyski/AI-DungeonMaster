@@ -45,7 +45,9 @@ class RoomController extends BaseController {
       
       const roomData = {
         id: room._id.toString(),
+        maxPlayers: room.maxPlayers,
         name: room.name,
+        players: room.players,
         owner: room.owner.name,
         ownerId: room.owner._id.toString(),
         inProgress: room.inProgress

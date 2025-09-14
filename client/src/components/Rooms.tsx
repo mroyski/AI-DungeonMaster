@@ -58,28 +58,32 @@ const Rooms: React.FC = () => {
     <div className={styles.outerContainer}>
       <div className={styles.container}>
         <h1>Rooms</h1>
-        
+
         <div className={styles.createRoomContainer}>
-          <button 
+          <button
             className={styles.createRoomButton}
             onClick={() => setCreateRoomModalOpen(true)}
           >
             Create New Room
           </button>
         </div>
-        
+
         {allRooms.map((r) => (
           <div key={r.id} className={styles.roomContainer}>
             <div className={styles.roomInfo}>
               <strong>{r.name}</strong>
               {r.owner && <small> (Owner: {r.owner})</small>}
+              <p>
+                Players: {r.players.length}/{r.maxPlayers}
+              </p>
             </div>
-            <button 
+            <button
               className={styles.joinButton}
               onClick={() => openJoinRoomModal(r)}
             >
               Join Room
             </button>
+            <hr />
           </div>
         ))}
 
@@ -88,7 +92,7 @@ const Rooms: React.FC = () => {
           onClose={() => setCreateRoomModalOpen(false)}
           onRoomCreated={handleRoomCreated}
         />
-        
+
         <JoinRoomModal
           isOpen={joinRoomModalOpen}
           room={selectedRoom}

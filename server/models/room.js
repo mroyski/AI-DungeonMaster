@@ -9,6 +9,7 @@ const roomSchema = new mongoose.Schema(
       ref: 'Player',
       required: true,
     },
+    maxPlayers: { type: Number, required: true, default: 5 },
     players: [
       { type: mongoose.Schema.Types.ObjectId, ref: 'Player', default: [] },
     ],
